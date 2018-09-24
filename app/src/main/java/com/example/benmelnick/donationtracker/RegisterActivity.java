@@ -72,8 +72,15 @@ public class RegisterActivity extends AppCompatActivity {
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password1) || !TextUtils.isEmpty(password1)) {
-            mPassword1.setError(getString(R.string.error_invalid_password));
+        if (TextUtils.isEmpty(password1)) {
+            mPassword1.setError(getString(R.string.error_field_required));
+            focusView = mPassword1;
+            cancel = true;
+        }
+        if (TextUtils.isEmpty(password2)) {
+            mPassword2.setError(getString(R.string.error_field_required));
+            focusView = mPassword2;
+            cancel = true;
         }
         if (!TextUtils.isEmpty(password1) && !isPasswordValid(password1)) {
             mPassword1.setError(getString(R.string.error_invalid_password));
@@ -81,8 +88,13 @@ public class RegisterActivity extends AppCompatActivity {
             cancel = true;
         }
         if (!TextUtils.isEmpty(password2) && !isPasswordValid(password2)) {
-            mPassword1.setError(getString(R.string.error_invalid_password));
+            mPassword2.setError(getString(R.string.error_invalid_password));
             focusView = mPassword2;
+            cancel = true;
+        }
+        if (!password1.equals(password2)) {
+            mPassword1.setError("Passwords must match.");
+            focusView = mPassword1;
             cancel = true;
         }
 
