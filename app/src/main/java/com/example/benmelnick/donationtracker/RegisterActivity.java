@@ -46,6 +46,14 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
+        Button backButton = (Button) findViewById(R.id.login);
+        backButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+            }
+        });
+
     }
 
     /**
