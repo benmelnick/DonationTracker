@@ -50,7 +50,10 @@ public class RegisterActivity extends AppCompatActivity {
         backButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
             }
         });
 
@@ -165,8 +168,11 @@ public class RegisterActivity extends AppCompatActivity {
             mAuthTask = null;
 
             if (success) {
+                Intent intent = new Intent(RegisterActivity.this, MainContentActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 finish();
-                startActivity(new Intent(RegisterActivity.this, MainContentActivity.class));
             } else {
                 mPassword1.setError(getString(R.string.error_incorrect_password));
                 mPassword1.requestFocus();
