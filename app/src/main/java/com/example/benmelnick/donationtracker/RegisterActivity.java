@@ -21,7 +21,7 @@ import org.w3c.dom.Text;
 public class RegisterActivity extends AppCompatActivity {
 
     //UI references
-    private TextInputEditText mUsername;
+    private TextInputEditText mEmail;
     private EditText mPassword1;
     private EditText mPassword2;
 
@@ -34,7 +34,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mUsername = (TextInputEditText) findViewById(R.id.register_username);
+        mEmail = (TextInputEditText) findViewById(R.id.register_email);
         mPassword1 = (EditText) findViewById(R.id.register_password1);
         mPassword2 = (EditText) findViewById(R.id.register_password2);
 
@@ -59,12 +59,12 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         // Reset errors.
-        mUsername.setError(null);
+        mEmail.setError(null);
         mPassword1.setError(null);
         mPassword2.setError(null);
 
         // Store values at the time of the login attempt.
-        String username = mUsername.getText().toString();
+        String email = mEmail.getText().toString();
         String password1 = mPassword1.getText().toString();
         String password2 = mPassword2.getText().toString();
 
@@ -98,10 +98,15 @@ public class RegisterActivity extends AppCompatActivity {
             cancel = true;
         }
 
-        // Check for a valid username
-        if (TextUtils.isEmpty(username)) {
-            mUsername.setError(getString(R.string.error_field_required));
-            focusView = mUsername;
+        // Check for a valid email
+        if (TextUtils.isEmpty(email)) {
+            mEmail.setError(getString(R.string.error_field_required));
+            focusView = mEmail;
+            cancel = true;
+        }
+        if (!isEmailValid(email)) {
+            mEmail.setError(getString(R.string.error_invalid_email));
+            focusView = mEmail;
             cancel = true;
         }
 
@@ -112,7 +117,7 @@ public class RegisterActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            mAuthTask = new UserLoginTask(username, password1);
+            mAuthTask = new UserLoginTask(email, password1);
             mAuthTask.execute((Void) null);
         }
     }
@@ -120,6 +125,11 @@ public class RegisterActivity extends AppCompatActivity {
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
         return password.length() > 4;
+    }
+
+    private boolean isEmailValid(String email) {
+        //TODO: Replace this with your own logic
+        return email.contains("@");
     }
 
     /**
