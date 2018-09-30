@@ -14,9 +14,14 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.graphics.Color;
 
 import org.w3c.dom.Text;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -24,6 +29,8 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputEditText mEmail;
     private EditText mPassword1;
     private EditText mPassword2;
+    private EditText mName;
+    private Spinner mType;
 
 
     //authentication for signing in - uses a class from LoginActivity
@@ -37,6 +44,8 @@ public class RegisterActivity extends AppCompatActivity {
         mEmail = (TextInputEditText) findViewById(R.id.register_email);
         mPassword1 = (EditText) findViewById(R.id.register_password1);
         mPassword2 = (EditText) findViewById(R.id.register_password2);
+        mName = (EditText) findViewById(R.id.register_name);
+        mType = (Spinner) findViewById(R.id.register_type);
 
         Button registerButton = (Button) findViewById(R.id.register_button);
         registerButton.setOnClickListener(new OnClickListener() {
@@ -57,6 +66,10 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
+        List<String> legalAccounts = Arrays.asList("Choose an account", "Admin", "Location Employee", "User");
+        ArrayAdapter<String> adapter = new ArrayAdapter(this,android.R.layout.simple_spinner_item, legalAccounts);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mType.setAdapter(adapter);
     }
 
     /**
@@ -73,14 +86,30 @@ public class RegisterActivity extends AppCompatActivity {
         mEmail.setError(null);
         mPassword1.setError(null);
         mPassword2.setError(null);
+        mName.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmail.getText().toString();
         String password1 = mPassword1.getText().toString();
         String password2 = mPassword2.getText().toString();
+        String name = mName.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
+
+        //check for a name
+        if (TextUtils.isEmpty(name)) {
+            mName.setError("This field is required.");
+            focusView = mName;
+            cancel = true;
+        }
+
+        //check for valid account type
+        if(mType.getSelectedItem().toString().equals("Choose an account type")) {
+            ((TextView)mType.getSelectedView()).setError("Must select an account type");
+            focusView = mType;
+            cancel = true;
+        }
 
         // Check for a valid password, if the user entered one.
         if (TextUtils.isEmpty(password1)) {
