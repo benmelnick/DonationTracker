@@ -49,9 +49,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
      */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
+    public static List<String> DUMMY_CREDENTIALS = new ArrayList<>();
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -104,6 +102,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        DUMMY_CREDENTIALS.add("foo@example.com:hello");
     }
 
     private void populateAutoComplete() {
@@ -334,8 +334,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     return pieces[1].equals(mPassword);
                 }
             }
-
-            // TODO: register the new account here.
             return true;
         }
 

@@ -32,9 +32,8 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText mName;
     private Spinner mType;
 
-
-    //authentication for signing in - uses a class from LoginActivity
-    private UserLoginTask mAuthTask = null;
+    //boolean to see if authentication has already been attempted
+    private boolean mAuthTask = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +65,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        List<String> legalAccounts = Arrays.asList("Choose an account", "Admin", "Location Employee", "User");
+        List<String> legalAccounts = Arrays.asList("Choose an account", "Admin", "Manager", "Location Employee", "User");
         ArrayAdapter<String> adapter = new ArrayAdapter(this,android.R.layout.simple_spinner_item, legalAccounts);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mType.setAdapter(adapter);
@@ -78,7 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
+        if (mAuthTask) {
             return;
         }
 
@@ -155,10 +154,11 @@ public class RegisterActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            mAuthTask = new UserLoginTask(email, password1);
-            mAuthTask.execute((Void) null);
+            //add the user to login credentials
+            LoginActivity.DUMMY_CREDENTIALS.add(email + ":" + password1);
+            mAuthTask = true;
+            Intent intent = new Intent(RegisterActivity.this, MainContentActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -172,47 +172,6 @@ public class RegisterActivity extends AppCompatActivity {
         return email.contains("@");
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: register the new account here.
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-
-            if (success) {
-                Intent intent = new Intent(RegisterActivity.this, MainContentActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
-            } else {
-                mPassword1.setError(getString(R.string.error_incorrect_password));
-                mPassword1.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-        }
-    }
 }
 
 
