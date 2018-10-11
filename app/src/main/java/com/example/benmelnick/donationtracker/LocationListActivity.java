@@ -40,26 +40,6 @@ public class LocationListActivity extends AppCompatActivity {
 
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         private List<Location> mItems;
-
-        // Provide a reference to the views for each data item
-        // Complex data items may need more than one view per item, and
-        // you provide access to all the views for a data item in a view holder
-        public class MyViewHolder extends RecyclerView.ViewHolder {
-            public View mView;
-            public final TextView mContentView;
-
-            public MyViewHolder(View v) {
-                super(v);
-                mView = v;
-                mContentView = (TextView) v.findViewById(R.id.content);
-            }
-
-            @Override
-            public String toString() {
-                return super.toString() + " '" + mContentView.getText() + "'";
-            }
-        }
-
         // Provide a suitable constructor (depends on the kind of dataset)
         public MyAdapter(List<Location> values) {
             mItems = values;
@@ -79,7 +59,6 @@ public class LocationListActivity extends AppCompatActivity {
         public void onBindViewHolder(MyViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            //holder.mView.setText(mItems.get(position).getName());
 
             holder.mContentView.setText(mItems.get(position).getName());
         }
@@ -88,6 +67,25 @@ public class LocationListActivity extends AppCompatActivity {
         @Override
         public int getItemCount() {
             return mItems.size();
+        }
+
+        // Provide a reference to the views for each data item
+        // Complex data items may need more than one view per item, and
+        // you provide access to all the views for a data item in a view holder
+        public class MyViewHolder extends RecyclerView.ViewHolder {
+            public View mView;
+            public final TextView mContentView;
+
+            public MyViewHolder(View v) {
+                super(v);
+                mView = v;
+                mContentView = v.findViewById(R.id.content);
+            }
+
+            @Override
+            public String toString() {
+                return super.toString() + " '" + mContentView.getText() + "'";
+            }
         }
     }
 }
