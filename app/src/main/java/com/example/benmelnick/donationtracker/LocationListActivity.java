@@ -46,9 +46,17 @@ public class LocationListActivity extends AppCompatActivity {
         // you provide access to all the views for a data item in a view holder
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public View mView;
+            public final TextView mContentView;
+
             public MyViewHolder(View v) {
                 super(v);
                 mView = v;
+                mContentView = (TextView) v.findViewById(R.id.content);
+            }
+
+            @Override
+            public String toString() {
+                return super.toString() + " '" + mContentView.getText() + "'";
             }
         }
 
@@ -71,7 +79,9 @@ public class LocationListActivity extends AppCompatActivity {
         public void onBindViewHolder(MyViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            holder.mView.setText(mItems.get(position).getName());
+            //holder.mView.setText(mItems.get(position).getName());
+
+            holder.mContentView.setText(mItems.get(position).getName());
         }
 
         // Return the size of your dataset (invoked by the layout manager)
