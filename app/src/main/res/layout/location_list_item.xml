@@ -8,5 +8,8 @@
         android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:layout_margin="15dp"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/design_default_color_primary"
+        android:textSize="20sp" />
 </LinearLayout>

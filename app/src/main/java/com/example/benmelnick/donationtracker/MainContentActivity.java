@@ -21,6 +21,13 @@ public class MainContentActivity extends AppCompatActivity {
     private static final String TAG = "DonationTracker";
 
     @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(MainContentActivity.this, LoginActivity.class);
+        startActivity(intent);
+        this.finish();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_content);
@@ -30,9 +37,8 @@ public class MainContentActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainContentActivity.this, LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -41,8 +47,6 @@ public class MainContentActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainContentActivity.this, LocationListActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
         });

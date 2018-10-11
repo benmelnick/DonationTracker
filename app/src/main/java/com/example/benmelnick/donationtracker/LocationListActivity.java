@@ -3,14 +3,9 @@ package com.example.benmelnick.donationtracker;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,23 +14,14 @@ import android.widget.TextView;
 import java.util.List;
 
 public class LocationListActivity extends AppCompatActivity {
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_list);
-        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
 
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        // specify an adapter (see also next example)
-        mAdapter = new MyAdapter(Model.INSTANCE.getItems());
-        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setAdapter(new MyAdapter(Model.INSTANCE.getItems()));
     }
 
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
@@ -56,11 +42,21 @@ public class LocationListActivity extends AppCompatActivity {
 
         // Replace the contents of a view (invoked by the layout manager)
         @Override
-        public void onBindViewHolder(MyViewHolder holder, int position) {
+        public void onBindViewHolder(final MyViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-
+            holder.mItem = mItems.get(position);
             holder.mContentView.setText(mItems.get(position).getName());
+
+            holder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, LocationDetailActivity.class);
+                    intent.putExtra(LocationDetailFragment.ARG_ITEM_ID, holder.mItem.getId());
+                    context.startActivity(intent);
+                }
+            });
         }
 
         // Return the size of your dataset (invoked by the layout manager)
@@ -75,6 +71,7 @@ public class LocationListActivity extends AppCompatActivity {
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public View mView;
             public final TextView mContentView;
+            public Location mItem;
 
             public MyViewHolder(View v) {
                 super(v);
