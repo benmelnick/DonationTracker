@@ -26,64 +26,55 @@ public class LocationListActivity extends AppCompatActivity {
 
         View recyclerView = findViewById(R.id.list);
         assert recyclerView != null;
+        setupRecyclerView((RecyclerView) recyclerView);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(Model.INSTANCE.getItems()));
+        recyclerView.setAdapter(new MyAdapter(Model.INSTANCE.getItems()));
     }
 
-    public class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+    public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+        private List<Location> mItems;
 
-        private final List<Location> mValues;
-
-        public SimpleItemRecyclerViewAdapter(List<Location> items) {
-            mValues = items;
+        // Provide a reference to the views for each data item
+        // Complex data items may need more than one view per item, and
+        // you provide access to all the views for a data item in a view holder
+        public class MyViewHolder extends RecyclerView.ViewHolder {
+            public TextView mTextView;
+            public MyViewHolder(TextView v) {
+                super(v);
+                mTextView = v;
+            }
         }
 
+        // Provide a suitable constructor (depends on the kind of dataset)
+        public MyAdapter(List<Location> values) {
+            mItems = values;
+        }
+
+        // Create new views (invoked by the layout manager)
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
+        public MyAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
+                                                         int viewType) {
+            // create a new view
+            TextView v = (TextView) LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.activity_location_list, parent, false);
-            return new ViewHolder(view);
+            MyViewHolder vh = new MyViewHolder(v);
+            return vh;
         }
 
+        // Replace the contents of a view (invoked by the layout manager)
         @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mItem = mValues.get(position);
-            holder.mIdView.setText("" + mValues.get(position).getId());
-            holder.mContentView.setText(mValues.get(position).getName());
-
-            holder.mView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //event handler for clicking on a location
-                }
-            });
+        public void onBindViewHolder(MyViewHolder holder, int position) {
+            // - get element from your dataset at this position
+            // - replace the contents of the view with that element
+            holder.mTextView.setText(mItems.get(position).getName());
         }
 
+        // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
-            return mValues.size();
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            public final View mView;
-            public final TextView mIdView;
-            public final TextView mContentView;
-            public Location mItem;
-
-            public ViewHolder(View view) {
-                super(view);
-                mView = view;
-                mIdView = (TextView) view.findViewById(R.id.id);
-                mContentView = (TextView) view.findViewById(R.id.content);
-            }
-
-            @Override
-            public String toString() {
-                return super.toString() + " '" + mContentView.getText() + "'";
-            }
+            return mItems.size();
         }
     }
 }
