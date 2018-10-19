@@ -20,12 +20,6 @@ public class LocationDetailActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
 
-
-    public void startAddItem(View v) {
-        startActivity(new Intent(LocationDetailActivity.this, AddItemActivity.class));
-        finish();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
