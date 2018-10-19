@@ -1,6 +1,7 @@
 package com.example.benmelnick.donationtracker;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
@@ -70,6 +71,16 @@ public class LocationDetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.phone)).setText("Phone Number:\n" + mItem.getPhoneNumber());
             mAuth = FirebaseAuth.getInstance();
             mDatabase = FirebaseDatabase.getInstance().getReference();
+
+            Button add = rootView.findViewById(R.id.add_item);
+            add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), AddItemActivity.class);
+                    intent.putExtra("location", mItem.getName());
+                    startActivity(intent);
+                }
+            });
 
             String id = mAuth.getCurrentUser().getUid();
             mDatabase.child("users").child(id).child("accountType").addValueEventListener(new ValueEventListener() {

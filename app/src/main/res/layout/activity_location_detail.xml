@@ -62,6 +62,5 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:text="Add Inventory"
-        android:visibility="gone"
-        android:onClick="startAddItem" />
+        android:visibility="gone" />
 </LinearLayout>
