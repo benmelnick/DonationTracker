@@ -9,7 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Button;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 /**
  * A fragment representing a single DataItem detail screen.
@@ -26,7 +33,8 @@ public class LocationDetailFragment extends Fragment {
      * The dummy content this fragment is presenting.
      */
     private Location mItem;
-
+    private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -49,7 +57,7 @@ public class LocationDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_location_detail, container, false);
+        final View rootView = inflater.inflate(R.layout.activity_location_detail, container, false);
 
         if (mItem != null) {
             ((TextView) rootView.findViewById(R.id.name)).setText(mItem.getName());
@@ -58,6 +66,24 @@ public class LocationDetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.latitude)).setText("Latitude:\n" + String.valueOf(mItem.getLatitude()));
             ((TextView) rootView.findViewById(R.id.address)).setText("Address:\n" + mItem.printFullAddress());
             ((TextView) rootView.findViewById(R.id.phone)).setText("Phone Number:\n" + mItem.getPhoneNumber());
+            mAuth = FirebaseAuth.getInstance();
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+
+            String id = mAuth.getCurrentUser().getUid();
+            mDatabase.child("users").child(id).child("accountType").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String value = (String)dataSnapshot.getValue();
+                    if (value.equals("Location Employee")) {
+                        ((Button) rootView.findViewById(R.id.add_item)).setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
 
         return rootView;

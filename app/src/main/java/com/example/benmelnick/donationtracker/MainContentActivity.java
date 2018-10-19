@@ -19,7 +19,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class MainContentActivity extends AppCompatActivity {
 
-    private static final String TAG = "DonationTracker";
     private FirebaseAuth mAuth;
 
     @Override
@@ -55,44 +54,5 @@ public class MainContentActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        readFile();
-    }
-
-    /**
-     * reads in data from CSV file and creates locations
-     * adds each location to model
-     */
-    private void readFile() {
-        Model model = Model.INSTANCE;
-        try {
-            //Open a stream on the raw file
-            InputStream is = getResources().openRawResource(R.raw.locationdata);
-            //From here we probably should call a model method and pass the InputStream
-            //Wrap it in a BufferedReader so that we get the readLine() method
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-            String line;
-            br.readLine(); //get rid of header line
-            while ((line = br.readLine()) != null) {
-                Log.d(MainContentActivity.TAG, line);
-                String[] tokens = line.split(",");
-                int id = Integer.parseInt(tokens[0]);
-                String name = tokens[1];
-                double lat = Double.parseDouble(tokens[2]);
-                double lon = Double.parseDouble(tokens[3]);
-                String address = tokens[4];
-                String city = tokens[5];
-                String state = tokens[6];
-                String zip = tokens[7];
-                String type = tokens[8];
-                String phone = tokens[9];
-                String web = tokens[10];
-                model.addItem(new Location(id, name, lat, lon, address, city, state, zip, type, phone, web));
-            }
-            br.close();
-        } catch (IOException e) {
-            Log.e(MainContentActivity.TAG, "error reading assets", e);
-        }
     }
 }
