@@ -25,6 +25,7 @@ public class LocationListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_list);
+
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
