@@ -1,5 +1,6 @@
 package com.example.benmelnick.donationtracker;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,35 +20,19 @@ public class LocationDetailActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
 
-    void makeButtonVisible() {
-        final Button addBtn = (Button) findViewById(R.id.add_item);
-
-        //make the button visible
-        addBtn.setVisibility(View.VISIBLE);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_detail);
 
-        mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        String id = mAuth.getCurrentUser().getUid();
-        mDatabase.child("users").child(id).child("accountType").addValueEventListener(new ValueEventListener() {
+        Button add = (Button)findViewById(R.id.add_item);
+        add.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String value = (String)dataSnapshot.getValue();
-                if (value.equals("Location Employee")) {
-                    System.out.println("Equals employee");
-                    makeButtonVisible();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+            public void onClick(View v) {
+                System.out.println("adding item^^^^^^^^^^^^^^^^^");
+                startActivity(new Intent(LocationDetailActivity.this, AddItemActivity.class));
+                finish();
             }
         });
 

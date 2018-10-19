@@ -1,6 +1,7 @@
 package com.example.benmelnick.donationtracker;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Button;
+
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -75,7 +77,8 @@ public class LocationDetailFragment extends Fragment {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     String value = (String)dataSnapshot.getValue();
                     if (value.equals("Location Employee")) {
-                        ((Button) rootView.findViewById(R.id.add_item)).setVisibility(View.VISIBLE);
+                        Button add = (Button) rootView.findViewById(R.id.add_item);
+                        add.setVisibility(View.VISIBLE);
                     }
                 }
 
