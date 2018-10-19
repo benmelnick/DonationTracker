@@ -115,16 +115,17 @@ public class AddItemActivity extends AppCompatActivity {
         SimpleDateFormat dateFormat;
 
         //need time stamp
+        String currentDate;
         try {
             dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            dateFormat.format(new Date()); // Find todays date
+            currentDate = dateFormat.format(new Date()); // Find todays date
         } catch (Exception e) {
             e.printStackTrace();
             return;
         }
 
         //add new item to database
-        Item item = new Item(dateFormat.toString(), shortDescription, fullDescription, value, category);
+        Item item = new Item(currentDate, shortDescription, fullDescription, value, category);
 
         //updates info for location
         mDatabase.child("locations").child(mLocation.getName()).setValue(mLocation);
