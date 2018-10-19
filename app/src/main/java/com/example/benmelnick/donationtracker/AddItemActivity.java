@@ -23,11 +23,13 @@ public class AddItemActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_item);
 
         mShort = (TextInputEditText)findViewById(R.id.short_description);
         mFull = (TextInputEditText)findViewById(R.id.full_description);
         mValue = (TextInputEditText)findViewById(R.id.value);
-        mCategory = (Spinner)findViewById(R.id.category);
+        mCategory = (Spinner) findViewById(R.id.category);
 
         Button submit = (Button)findViewById(R.id.submit);
 
@@ -35,9 +37,6 @@ public class AddItemActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, legalCategories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mCategory.setAdapter(adapter);
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_item);
     }
 
     public void validateForm(View v) {
