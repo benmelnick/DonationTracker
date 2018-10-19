@@ -5,7 +5,6 @@ package com.example.benmelnick.donationtracker;
  */
 public class Item {
     private String timeStamp;
-    private Location location;
     private String shortDescription;
     private String fullDescription;
     private double value;
@@ -15,9 +14,8 @@ public class Item {
 
     }
 
-    public Item(String t, Location l, String s, String f, double v, String c) {
+    public Item(String t, String s, String f, double v, String c) {
         timeStamp = t;
-        location = l;
         shortDescription = s;
         fullDescription = f;
         value = v;
@@ -30,14 +28,6 @@ public class Item {
 
     public void setTimeStamp(String t) {
         timeStamp = t;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location l) {
-        location = l;
     }
 
     public String getShortDescription() {
