@@ -77,7 +77,7 @@ public class LocationDetailFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getActivity(), AddItemActivity.class);
-                    intent.putExtra("location", mItem.getName());
+                    intent.putExtra("id", mItem.getId());
                     startActivity(intent);
                 }
             });
