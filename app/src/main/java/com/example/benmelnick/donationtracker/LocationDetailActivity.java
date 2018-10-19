@@ -21,20 +21,15 @@ public class LocationDetailActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
 
 
+    public void startAddItem(View v) {
+        startActivity(new Intent(LocationDetailActivity.this, AddItemActivity.class));
+        finish();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_detail);
-
-        Button add = (Button)findViewById(R.id.add_item);
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.out.println("adding item^^^^^^^^^^^^^^^^^");
-                startActivity(new Intent(LocationDetailActivity.this, AddItemActivity.class));
-                finish();
-            }
-        });
 
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
