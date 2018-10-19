@@ -25,18 +25,12 @@ public class AddItemActivity extends AppCompatActivity {
         mCategory = (Spinner)findViewById(R.id.category);
 
         Button submit = (Button)findViewById(R.id.submit);
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                validateForm();
-            }
-        });
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_item);
     }
 
-    private void validateForm() {
+    public void validateForm(View v) {
         //validates the inputs in the form
     }
 }
