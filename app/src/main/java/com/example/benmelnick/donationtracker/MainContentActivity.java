@@ -15,10 +15,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainContentActivity extends AppCompatActivity {
 
     private static final String TAG = "DonationTracker";
+    private FirebaseAuth mAuth;
 
     @Override
     public void onBackPressed() {
@@ -32,10 +34,13 @@ public class MainContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_content);
 
+        mAuth = FirebaseAuth.getInstance();
+
         Button mLogout = (Button) findViewById(R.id.logout_button);
         mLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mAuth.signOut();
                 Intent intent = new Intent(MainContentActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();

@@ -182,6 +182,7 @@ public class RegisterActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(RegisterActivity.this, "Sign Up Failed",
                                     Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, task.getException().toString());
                         }
                     }
                 });

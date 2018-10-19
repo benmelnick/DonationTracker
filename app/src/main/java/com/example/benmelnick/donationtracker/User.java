@@ -1,10 +1,17 @@
 package com.example.benmelnick.donationtracker;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
+@IgnoreExtraProperties
 public class User {
-    private String userId;
-    private String email;
-    private String name;
-    private String accountType;
+    public String userId;
+    public String email;
+    public String name;
+    public String accountType;
+
+    public User() {
+
+    }
 
     public User(String id, String e, String n, String t) {
         userId = id;
@@ -12,4 +19,6 @@ public class User {
         name = n;
         accountType = t;
     }
+
+
 }
