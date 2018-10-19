@@ -54,6 +54,10 @@ public class Location {
         return address;
     }
 
+    public String printFullAddress() {
+        return address + ", " + city + ", " + state + " " + zip;
+    }
+
     public String getCity() {
         return city;
     }

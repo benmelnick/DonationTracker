@@ -2,6 +2,7 @@ package com.example.benmelnick.donationtracker;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,13 +18,25 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.graphics.Color;
+import android.widget.Toast;
+import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import org.w3c.dom.Text;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public class RegisterActivity extends AppCompatActivity {
+
+    private static final String TAG = "RegisterActivity";
 
     //UI references
     private TextInputEditText mEmail;
@@ -33,7 +46,8 @@ public class RegisterActivity extends AppCompatActivity {
     private Spinner mType;
 
     //boolean to see if authentication has already been attempted
-    private boolean mAuthTask = false;
+    private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
 
     @Override
     public void onBackPressed() {
@@ -46,6 +60,9 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         mEmail = (TextInputEditText) findViewById(R.id.register_email);
         mPassword1 = (EditText) findViewById(R.id.register_password1);
@@ -73,10 +90,6 @@ public class RegisterActivity extends AppCompatActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask) {
-            return;
-        }
-
         // Reset errors.
         mEmail.setError(null);
         mPassword1.setError(null);
@@ -150,12 +163,43 @@ public class RegisterActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            //add the user to login credentials
-            LoginActivity.DUMMY_CREDENTIALS.add(email + ":" + password1);
-            mAuthTask = true;
-            Intent intent = new Intent(RegisterActivity.this, MainContentActivity.class);
-            startActivity(intent);
+            signUp();
         }
+    }
+
+    private void signUp() {
+        String email = mEmail.getText().toString();
+        String password = mPassword1.getText().toString();
+
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "createUser:onComplete:" + task.isSuccessful());
+
+                        if (task.isSuccessful()) {
+                            onAuthSuccess(task.getResult().getUser());
+                        } else {
+                            Toast.makeText(RegisterActivity.this, "Sign Up Failed",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void onAuthSuccess(FirebaseUser user) {
+        //create new user and add to database
+        String id = user.getUid();
+        String email = user.getEmail();
+        String name = mName.getText().toString();
+        String type = mType.getSelectedItem().toString();
+        User newUser = new User(id, email, name, type);
+
+        mDatabase.child("users").child(id).setValue(newUser);
+
+        // Go to MainActivity
+        startActivity(new Intent(RegisterActivity.this, MainContentActivity.class));
+        finish();
     }
 
     private boolean isPasswordValid(String password) {
