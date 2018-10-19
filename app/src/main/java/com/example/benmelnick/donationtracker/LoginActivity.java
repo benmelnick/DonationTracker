@@ -168,7 +168,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private void attemptLogin() {
         if (mAuth.getCurrentUser() != null) {
-            return;
+            mAuth.signOut();
         }
 
         // Reset errors.
