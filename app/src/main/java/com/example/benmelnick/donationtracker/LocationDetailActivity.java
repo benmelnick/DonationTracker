@@ -19,6 +19,13 @@ public class LocationDetailActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
 
+    void makeButtonVisible() {
+        final Button addBtn = (Button) findViewById(R.id.add_item);
+
+        //make the button visible
+        addBtn.setVisibility(View.VISIBLE);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,16 +34,14 @@ public class LocationDetailActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        final Button addBtn = (Button)findViewById(R.id.add_item);
-
         String id = mAuth.getCurrentUser().getUid();
         mDatabase.child("users").child(id).child("accountType").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String value = (String)dataSnapshot.getValue();
                 if (value.equals("Location Employee")) {
-                    //make the button visible
-                    addBtn.setVisibility(View.VISIBLE);
+                    System.out.println("Equals employee");
+                    makeButtonVisible();
                 }
             }
 
