@@ -72,30 +72,13 @@ public class LocationDetailFragment extends Fragment {
             mAuth = FirebaseAuth.getInstance();
             mDatabase = FirebaseDatabase.getInstance().getReference();
 
-            Button add = rootView.findViewById(R.id.add_item);
-            add.setOnClickListener(new View.OnClickListener() {
+            Button inventory = rootView.findViewById(R.id.view_items);
+            inventory.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(getActivity(), AddItemActivity.class);
+                    Intent intent = new Intent(getActivity(), InventoryListActivity.class);
                     intent.putExtra("id", mItem.getId());
                     startActivity(intent);
-                }
-            });
-
-            String id = mAuth.getCurrentUser().getUid();
-            mDatabase.child("users").child(id).child("accountType").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    String value = (String)dataSnapshot.getValue();
-                    if (value.equals("Location Employee")) {
-                        Button add = (Button) rootView.findViewById(R.id.add_item);
-                        add.setVisibility(View.VISIBLE);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
                 }
             });
         }

@@ -27,7 +27,8 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LocationListActivity" />
         <activity android:name=".LocationDetailActivity" />
-        <activity android:name=".AddItemActivity"></activity>
+        <activity android:name=".AddItemActivity" />
+        <activity android:name=".InventoryListActivity"></activity>
     </application>
 
 </manifest>

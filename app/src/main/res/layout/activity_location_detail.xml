@@ -57,10 +57,10 @@
         android:textSize="20sp" />
 
     <Button
-        android:id="@+id/add_item"
+        android:id="@+id/view_items"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="Add Inventory"
+        android:text="View Inventory"
         android:visibility="gone" />
 </LinearLayout>
