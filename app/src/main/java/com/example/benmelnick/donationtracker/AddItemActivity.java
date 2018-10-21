@@ -128,7 +128,7 @@ public class AddItemActivity extends AppCompatActivity {
         Item item = new Item(currentDate, shortDescription, fullDescription, value, category);
 
         //updates info for location
-        mDatabase.child("locations").child(mLocation.getName()).setValue(mLocation);
+        //mDatabase.child("locations").child(mLocation.getName()).setValue(mLocation);
         //adds new item to location's sub-database of items
         mDatabase.child("locations").child(mLocation.getName()).child("inventory").child(shortDescription).setValue(item);
     }
