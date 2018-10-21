@@ -81,6 +81,32 @@ public class LocationDetailFragment extends Fragment {
                     startActivity(intent);
                 }
             });
+
+            String id = mAuth.getCurrentUser().getUid();
+            mDatabase.child("users").child(id).child("accountType").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String value = (String)dataSnapshot.getValue();
+                    if (value.equals("Location Employee")) {
+                        Button add = (Button) rootView.findViewById(R.id.add_item);
+                        add.setVisibility(View.VISIBLE);
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+            Button add = (Button)rootView.findViewById(R.id.add_item);
+            add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), AddItemActivity.class);
+                    intent.putExtra("id", mItem.getId());
+                    startActivity(intent);
+                }
+            });
         }
 
         return rootView;

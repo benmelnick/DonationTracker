@@ -66,34 +66,6 @@ public class InventoryListActivity extends AppCompatActivity {
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(new MyAdapter(mItems));
-
-        /*String id = mAuth.getCurrentUser().getUid();
-        mDatabase.child("users").child(id).child("accountType").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String value = (String)dataSnapshot.getValue();
-                if (value.equals("Location Employee")) {
-                    Button add = (Button) findViewById(R.id.add_item);
-                    add.setVisibility(View.VISIBLE);
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
-        /*Button add = (Button)findViewById(R.id.add_item);
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(InventoryListActivity.this, AddItemActivity.class);
-                intent.putExtra("id", mLocation.getId());
-                startActivity(intent);
-            }
-        });*/
-
     }
 
     private void readInventory() {
@@ -127,16 +99,17 @@ public class InventoryListActivity extends AppCompatActivity {
             // create a new view
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.inventory_list_item, parent, false);
-            return new MyAdapter.MyViewHolder(v);
+            return new MyViewHolder(v);
         }
 
         // Replace the contents of a view (invoked by the layout manager)
         @Override
-        public void onBindViewHolder(final MyAdapter.MyViewHolder holder, int position) {
+        public void onBindViewHolder(final MyViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
             holder.mItem = mItems.get(position);
             holder.mContentView.setText(mItems.get(position));
+            System.out.println(mItems.get(position) + "^^^^^^^^^^^^^^^");
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
