@@ -66,12 +66,14 @@ public class LocationDetailFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.activity_location_detail, container, false);
 
         if (mLocation != null) {
+            String coordinates = mLocation.getLongitude() + ", " + mLocation.getLatitude();
             ((TextView) rootView.findViewById(R.id.name)).setText(mLocation.getName());
             ((TextView) rootView.findViewById(R.id.type)).setText("Type:\n" + mLocation.getType());
-            ((TextView) rootView.findViewById(R.id.longitude)).setText("Longitude:\n" + String.valueOf(mLocation.getLongitude()));
-            ((TextView) rootView.findViewById(R.id.latitude)).setText("Latitude:\n" + String.valueOf(mLocation.getLatitude()));
+            ((TextView) rootView.findViewById(R.id.coordinates)).setText("Coordinates:\n" + coordinates);
             ((TextView) rootView.findViewById(R.id.address)).setText("Address:\n" + mLocation.printFullAddress());
             ((TextView) rootView.findViewById(R.id.phone)).setText("Phone Number:\n" + mLocation.getPhoneNumber());
+
+
             mAuth = FirebaseAuth.getInstance();
             mDatabase = FirebaseDatabase.getInstance().getReference();
 

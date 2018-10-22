@@ -83,6 +83,9 @@ public class InventoryListActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ItemAdapter(mItems);
         mRecyclerView.setAdapter(adapter);
+
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("Inventory");
     }
 
     public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> {

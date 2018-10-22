@@ -4,13 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginLeft="16dp"
+    android:layout_marginTop="24dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginBottom="24dp"
     tools:context=".AddItemActivity">
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout3"
-        android:layout_width="368dp"
-        android:layout_height="74dp"
-        android:layout_marginTop="24dp"
+        android:id="@+id/shortLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -19,60 +22,61 @@
             android:id="@+id/short_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Short description" />
+            android:hint="@string/add_short_description"
+            android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout4"
-        android:layout_width="368dp"
-        android:layout_height="123dp"
-        android:layout_marginTop="24dp"
+        android:id="@+id/fullLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+        app:layout_constraintTop_toBottomOf="@+id/shortLayout">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/full_description"
             android:layout_width="match_parent"
             android:layout_height="96dp"
-            android:hint="Full description" />
+            android:hint="@string/add_full_description"
+            android:singleLine="false" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout5"
-        android:layout_width="368dp"
+        android:id="@+id/valueLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
+        app:layout_constraintTop_toBottomOf="@+id/fullLayout">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/value"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Value (in dollars)" />
+            android:hint="@string/add_value_in_dollars"
+            android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
 
     <Spinner
         android:id="@+id/category"
-        android:layout_width="368dp"
-        android:layout_height="54dp"
-        android:layout_marginTop="24dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout5" />
+        app:layout_constraintTop_toBottomOf="@+id/valueLayout" />
 
     <Button
         android:id="@+id/submit"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Submit Inventory"
         android:onClick="validateForm"
+        android:text="@string/add_submit_inventory"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/category"
-        app:layout_constraintVertical_bias="0.34" />
+        app:layout_constraintStart_toStartOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

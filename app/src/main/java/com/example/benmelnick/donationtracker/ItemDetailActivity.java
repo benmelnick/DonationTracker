@@ -21,5 +21,8 @@ public class ItemDetailActivity extends AppCompatActivity {
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction().add(R.id.linear, fragment).commit();
         }
+
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("Item Information");
     }
 }

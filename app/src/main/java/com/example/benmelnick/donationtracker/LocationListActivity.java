@@ -35,6 +35,9 @@ public class LocationListActivity extends AppCompatActivity {
         if (adapter.getItemCount() == 0) {
             readFile();
         }
+
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("Donation Centers");
     }
 
     /**

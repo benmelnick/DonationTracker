@@ -116,4 +116,8 @@
     <string name="login_register_button_text">Register</string>
     <string name="add_inventory">Add Inventory</string>
     <string name="view_inventory">View Inventory</string>
+    <string name="add_short_description">Name</string>
+    <string name="add_full_description">Description</string>
+    <string name="add_value_in_dollars">Price</string>
+    <string name="add_submit_inventory">Add Item</string>
 </resources>

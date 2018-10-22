@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
+
 /**
  * A fragment representing a single DataItem detail screen.
  * This fragment is contained in {@link LocationDetailActivity}.
@@ -44,10 +46,13 @@ public class ItemDetailFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.activity_item_detail, container, false);
 
         if (mItem != null) {
+            DecimalFormat df = new DecimalFormat("#.00");
+            String price = df.format(mItem.getValue());
+
             ((TextView) rootView.findViewById(R.id.short_description)).setText(mItem.getShortDescription());
             ((TextView) rootView.findViewById(R.id.full_description)).setText("Description:\n" + mItem.getFullDescription());
             ((TextView) rootView.findViewById(R.id.timestamp)).setText("Added:\n" + mItem.getTimeStamp());
-            ((TextView) rootView.findViewById(R.id.value)).setText("Price:\n$" + mItem.getValue());
+            ((TextView) rootView.findViewById(R.id.value)).setText("Price:\n$" + price);
             ((TextView) rootView.findViewById(R.id.category)).setText("Category:\n" + mItem.getCategory());
         } else {
             Toast.makeText(getContext(), "The item's information could not be loaded at this time!",
