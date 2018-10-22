@@ -1,7 +1,5 @@
 package com.example.benmelnick.donationtracker;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,8 +11,6 @@ import android.widget.Button;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import org.w3c.dom.Text;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +50,7 @@ public class AddItemActivity extends AppCompatActivity {
         mCategory.setAdapter(adapter);
 
         int locationId = getIntent().getIntExtra("id", 0);
-        mLocation = Model.INSTANCE.findItemById(locationId);
+        mLocation = Model.INSTANCE.findLocationById(locationId);
     }
 
     public void validateForm(View v) {

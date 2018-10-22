@@ -10,11 +10,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -46,7 +44,7 @@ public class InventoryListActivity extends AppCompatActivity {
 
         //define the location being referenced
         int locationId = getIntent().getIntExtra("id", 0);
-        mLocation = Model.INSTANCE.findItemById(locationId);
+        mLocation = Model.INSTANCE.findLocationById(locationId);
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -101,7 +99,12 @@ public class InventoryListActivity extends AppCompatActivity {
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //direct to detailed view
+                    /*
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, ItemDetailActivity.class);
+                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.getId());
+                    context.startActivity(intent);
+                    */
                 }
             });
         }

@@ -1,12 +1,8 @@
 package com.example.benmelnick.donationtracker;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,7 +49,7 @@ public class LocationDetailFragment extends Fragment {
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
             int item_id = getArguments().getInt(ARG_ITEM_ID);
-            mItem = Model.INSTANCE.findItemById(item_id);
+            mItem = Model.INSTANCE.findLocationById(item_id);
         }
     }
 
@@ -72,24 +68,18 @@ public class LocationDetailFragment extends Fragment {
             mAuth = FirebaseAuth.getInstance();
             mDatabase = FirebaseDatabase.getInstance().getReference();
 
-            Button inventory = rootView.findViewById(R.id.view_items);
-            inventory.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getActivity(), InventoryListActivity.class);
-                    intent.putExtra("id", mItem.getId());
-                    startActivity(intent);
-                }
-            });
+            final Button inventoryBttn = (Button) rootView.findViewById(R.id.view_items);
+            final Button addBttn = (Button) rootView.findViewById(R.id.add_item);
 
             String id = mAuth.getCurrentUser().getUid();
             mDatabase.child("users").child(id).child("accountType").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    String value = (String)dataSnapshot.getValue();
+                    String value = (String) dataSnapshot.getValue();
+
                     if (value.equals("Location Employee")) {
-                        Button add = (Button) rootView.findViewById(R.id.add_item);
-                        add.setVisibility(View.VISIBLE);
+                        addBttn.setVisibility(View.VISIBLE);
+                        inventoryBttn.setVisibility(View.VISIBLE);
                     }
                 }
                 @Override
@@ -98,8 +88,16 @@ public class LocationDetailFragment extends Fragment {
                 }
             });
 
-            Button add = (Button)rootView.findViewById(R.id.add_item);
-            add.setOnClickListener(new View.OnClickListener() {
+            inventoryBttn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), InventoryListActivity.class);
+                    intent.putExtra("id", mItem.getId());
+                    startActivity(intent);
+                }
+            });
+
+            addBttn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getActivity(), AddItemActivity.class);

@@ -29,7 +29,7 @@ public class LocationListActivity extends AppCompatActivity {
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(new MyAdapter(Model.INSTANCE.getItems()));
+        mRecyclerView.setAdapter(new MyAdapter(Model.INSTANCE.getLocations()));
 
         readFile();
     }
@@ -63,7 +63,7 @@ public class LocationListActivity extends AppCompatActivity {
                 String type = tokens[8];
                 String phone = tokens[9];
                 String web = tokens[10];
-                model.addItem(new Location(id, name, lat, lon, address, city, state, zip, type, phone, web));
+                model.addLocation(new Location(id, name, lat, lon, address, city, state, zip, type, phone, web));
             }
             br.close();
         } catch (IOException e) {
@@ -84,7 +84,6 @@ public class LocationListActivity extends AppCompatActivity {
             // create a new view
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.location_list_item, parent, false);
-            System.out.println("~~~~~~~~~~~~~~~ Creating location");
             return new MyViewHolder(v);
         }
 
