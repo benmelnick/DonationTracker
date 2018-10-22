@@ -35,6 +35,10 @@ public class InventoryListActivity extends AppCompatActivity {
     private Location mLocation; //reference to the current location
     private final ArrayList<String> mItems = new ArrayList<>();
 
+    private RecyclerView mRecyclerView;
+    private MyAdapter adapter;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,34 +52,13 @@ public class InventoryListActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         //read all the inventory from the database - add to array list for displaying
-        mDatabase.child("locations").child(mLocation.getName()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild("inventory")) {
-                    //if the location has inventory - add it to mItems
-                    readInventory();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(new MyAdapter(mItems));
-    }
-
-    private void readInventory() {
         mDatabase.child("locations").child(mLocation.getName()).child("inventory").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     String item = ds.child("shortDescription").getValue().toString();
                     mItems.add(item);
-                    System.out.println("added " + item + "^^^^^^^^^^^^^^^^");
+                    adapter.notifyDataSetChanged();
                 }
             }
 
@@ -84,6 +67,11 @@ public class InventoryListActivity extends AppCompatActivity {
 
             }
         });
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new MyAdapter(mItems);
+        mRecyclerView.setAdapter(adapter);
     }
 
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
@@ -109,7 +97,6 @@ public class InventoryListActivity extends AppCompatActivity {
             // - replace the contents of the view with that element
             holder.mItem = mItems.get(position);
             holder.mContentView.setText(mItems.get(position));
-            System.out.println(mItems.get(position) + "^^^^^^^^^^^^^^^");
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override

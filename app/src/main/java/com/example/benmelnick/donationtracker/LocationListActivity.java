@@ -84,6 +84,7 @@ public class LocationListActivity extends AppCompatActivity {
             // create a new view
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.location_list_item, parent, false);
+            System.out.println("~~~~~~~~~~~~~~~ Creating location");
             return new MyViewHolder(v);
         }
 
