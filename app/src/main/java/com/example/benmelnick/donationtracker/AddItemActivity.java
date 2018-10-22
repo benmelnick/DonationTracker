@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -97,6 +98,8 @@ public class AddItemActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             addNewItem();
+            Toast.makeText(AddItemActivity.this, "New Inventory Added",
+                    Toast.LENGTH_SHORT).show();
         }
     }
 

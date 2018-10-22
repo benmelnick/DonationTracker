@@ -99,12 +99,13 @@ public class InventoryListActivity extends AppCompatActivity {
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    /*
+
                     Context context = v.getContext();
                     Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.getId());
+                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem);
+                    intent.putExtra(ItemDetailFragment.ARG_LOCATION_ID, mLocation.getId());
                     context.startActivity(intent);
-                    */
+
                 }
             });
         }
