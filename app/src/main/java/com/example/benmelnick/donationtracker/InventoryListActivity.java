@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -31,10 +32,10 @@ public class InventoryListActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     private Location mLocation; //reference to the current location
-    private final ArrayList<String> mItems = new ArrayList<>();
+    private final ArrayList<Item> mItems = new ArrayList<>();
 
     private RecyclerView mRecyclerView;
-    private MyAdapter adapter;
+    private ItemAdapter adapter;
 
 
     @Override
@@ -54,34 +55,46 @@ public class InventoryListActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    String item = ds.child("shortDescription").getValue().toString();
+                    String timeStamp = ds.child("timeStamp").getValue().toString();
+                    String shortDescription = ds.child("shortDescription").getValue().toString();
+                    String fullDescription = ds.child("fullDescription").getValue().toString();
+                    double value = Double.valueOf(ds.child("value").getValue().toString());
+                    String category = ds.child("category").getValue().toString();
+                    Item item = new Item(timeStamp, shortDescription, fullDescription, value, category);
+
                     mItems.add(item);
                     adapter.notifyDataSetChanged();
+                }
+
+                if (mItems.size() == 0) {
+                    Toast.makeText(InventoryListActivity.this, "This location does not have any items in its inventory!",
+                            Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Toast.makeText(InventoryListActivity.this, "The inventory data could not be loaded at this time!",
+                        Toast.LENGTH_LONG).show();
             }
         });
 
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new MyAdapter(mItems);
+        adapter = new ItemAdapter(mItems);
         mRecyclerView.setAdapter(adapter);
     }
 
-    public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-        private List<String> mItems;
+    public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> {
+        private List<Item> mItems;
         // Provide a suitable constructor (depends on the kind of dataset)
-        public MyAdapter(List<String> values) {
+        public ItemAdapter(List<Item> values) {
             mItems = values;
         }
 
         // Create new views (invoked by the layout manager)
         @Override
-        public MyAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public ItemAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             // create a new view
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.inventory_list_item, parent, false);
@@ -94,18 +107,15 @@ public class InventoryListActivity extends AppCompatActivity {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
             holder.mItem = mItems.get(position);
-            holder.mContentView.setText(mItems.get(position));
+            holder.mContentView.setText(mItems.get(position).getShortDescription());
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     Context context = v.getContext();
                     Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem);
-                    intent.putExtra(ItemDetailFragment.ARG_LOCATION_ID, mLocation.getId());
+                    intent.putExtra(ItemDetailFragment.ARG_ITEM, holder.mItem);
                     context.startActivity(intent);
-
                 }
             });
         }
@@ -122,7 +132,7 @@ public class InventoryListActivity extends AppCompatActivity {
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public View mView;
             public final TextView mContentView;
-            public String mItem;
+            public Item mItem;
 
             public MyViewHolder(View v) {
                 super(v);

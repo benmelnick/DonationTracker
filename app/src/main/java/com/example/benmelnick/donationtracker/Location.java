@@ -1,9 +1,11 @@
 package com.example.benmelnick.donationtracker;
 
+import java.io.Serializable;
+
 /**
  * Location class for storing information for centers read from CSV file
  */
-public class Location {
+public class Location implements Serializable {
     private int id;
     private String name;
     private String type;

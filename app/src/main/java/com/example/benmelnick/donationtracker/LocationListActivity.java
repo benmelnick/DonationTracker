@@ -27,11 +27,14 @@ public class LocationListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_location_list);
 
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        LocationAdapter adapter = new LocationAdapter(Model.INSTANCE.getLocations());
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(new MyAdapter(Model.INSTANCE.getLocations()));
+        mRecyclerView.setAdapter(adapter);
 
-        readFile();
+        if (adapter.getItemCount() == 0) {
+            readFile();
+        }
     }
 
     /**
@@ -71,16 +74,16 @@ public class LocationListActivity extends AppCompatActivity {
         }
     }
 
-    public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-        private List<Location> mItems;
+    public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.MyViewHolder> {
+        private List<Location> mLocations;
         // Provide a suitable constructor (depends on the kind of dataset)
-        public MyAdapter(List<Location> values) {
-            mItems = values;
+        public LocationAdapter(List<Location> values) {
+            mLocations = values;
         }
 
         // Create new views (invoked by the layout manager)
         @Override
-        public MyAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public LocationAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             // create a new view
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.location_list_item, parent, false);
@@ -92,15 +95,16 @@ public class LocationListActivity extends AppCompatActivity {
         public void onBindViewHolder(final MyViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            holder.mItem = mItems.get(position);
-            holder.mContentView.setText(mItems.get(position).getName());
+            holder.mLocation = mLocations.get(position);
+            holder.mContentView.setText(mLocations.get(position).getName());
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, LocationDetailActivity.class);
-                    intent.putExtra(LocationDetailFragment.ARG_ITEM_ID, holder.mItem.getId());
+                    intent.putExtra(LocationDetailFragment.ARG_ITEM_ID, holder.mLocation.getId());
+                    intent.putExtra(LocationDetailFragment.ARG_LOCATION, holder.mLocation);
                     context.startActivity(intent);
                 }
             });
@@ -109,7 +113,7 @@ public class LocationListActivity extends AppCompatActivity {
         // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
-            return mItems.size();
+            return mLocations.size();
         }
 
         // Provide a reference to the views for each data item
@@ -118,7 +122,7 @@ public class LocationListActivity extends AppCompatActivity {
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public View mView;
             public final TextView mContentView;
-            public Location mItem;
+            public Location mLocation;
 
             public MyViewHolder(View v) {
                 super(v);

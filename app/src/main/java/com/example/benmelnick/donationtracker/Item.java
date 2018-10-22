@@ -1,9 +1,11 @@
 package com.example.benmelnick.donationtracker;
 
+import java.io.Serializable;
+
 /**
  * information holder for donation items
  */
-public class Item {
+public class Item implements Serializable  {
     private String timeStamp;
     private String shortDescription;
     private String fullDescription;
@@ -60,5 +62,10 @@ public class Item {
 
     public void setCategory(String c) {
         category = c;
+    }
+
+    @Override
+    public String toString() {
+        return shortDescription;
     }
 }

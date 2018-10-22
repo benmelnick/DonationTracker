@@ -27,11 +27,12 @@ public class LocationDetailFragment extends Fragment {
      * represents.
      */
     public static final String ARG_ITEM_ID = "item_id";
+    public static final String ARG_LOCATION = "location";
 
     /**
      * The dummy content this fragment is presenting.
      */
-    private Location mItem;
+    private Location mLocation;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     /**
@@ -45,12 +46,18 @@ public class LocationDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
-            // Load the dummy content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
             int item_id = getArguments().getInt(ARG_ITEM_ID);
-            mItem = Model.INSTANCE.findLocationById(item_id);
+            mLocation = Model.INSTANCE.findLocationById(item_id);
         }
+
+        /*
+        // Use if we aren't required to use Model
+        // This loads the Location object directly without looking it up from a list
+
+        if (getArguments().containsKey(ARG_LOCATION)) {
+            mLocation = (Location) getArguments().getSerializable(ARG_LOCATION);
+        }
+        */
     }
 
     @Override
@@ -58,13 +65,13 @@ public class LocationDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.activity_location_detail, container, false);
 
-        if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.name)).setText(mItem.getName());
-            ((TextView) rootView.findViewById(R.id.type)).setText("Type:\n" + mItem.getType());
-            ((TextView) rootView.findViewById(R.id.longitude)).setText("Longitude:\n" + String.valueOf(mItem.getLongitude()));
-            ((TextView) rootView.findViewById(R.id.latitude)).setText("Latitude:\n" + String.valueOf(mItem.getLatitude()));
-            ((TextView) rootView.findViewById(R.id.address)).setText("Address:\n" + mItem.printFullAddress());
-            ((TextView) rootView.findViewById(R.id.phone)).setText("Phone Number:\n" + mItem.getPhoneNumber());
+        if (mLocation != null) {
+            ((TextView) rootView.findViewById(R.id.name)).setText(mLocation.getName());
+            ((TextView) rootView.findViewById(R.id.type)).setText("Type:\n" + mLocation.getType());
+            ((TextView) rootView.findViewById(R.id.longitude)).setText("Longitude:\n" + String.valueOf(mLocation.getLongitude()));
+            ((TextView) rootView.findViewById(R.id.latitude)).setText("Latitude:\n" + String.valueOf(mLocation.getLatitude()));
+            ((TextView) rootView.findViewById(R.id.address)).setText("Address:\n" + mLocation.printFullAddress());
+            ((TextView) rootView.findViewById(R.id.phone)).setText("Phone Number:\n" + mLocation.getPhoneNumber());
             mAuth = FirebaseAuth.getInstance();
             mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -92,7 +99,7 @@ public class LocationDetailFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getActivity(), InventoryListActivity.class);
-                    intent.putExtra("id", mItem.getId());
+                    intent.putExtra("id", mLocation.getId());
                     startActivity(intent);
                 }
             });
@@ -101,7 +108,7 @@ public class LocationDetailFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getActivity(), AddItemActivity.class);
-                    intent.putExtra("id", mItem.getId());
+                    intent.putExtra("id", mLocation.getId());
                     startActivity(intent);
                 }
             });

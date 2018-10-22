@@ -9,14 +9,6 @@
     tools:context=".LocationDetailActivity">
 
     <TextView
-        android:id="@+id/timestamp"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="20sp" />
-
-    <TextView
         android:id="@+id/short_description"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -26,6 +18,14 @@
 
     <TextView
         android:id="@+id/full_description"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/timestamp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
