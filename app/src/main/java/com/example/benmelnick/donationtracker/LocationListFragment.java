@@ -2,8 +2,9 @@ package com.example.benmelnick.donationtracker;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,26 +19,53 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
-public class LocationListActivity extends AppCompatActivity {
-    private static final String TAG = "LocationListActivity";
+import androidx.navigation.fragment.NavHostFragment;
+
+
+public class LocationListFragment extends ActionBarFragment {
+
+    public LocationListFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment LocationListFragment.
+     */
+    public static LocationListFragment newInstance() {
+        LocationListFragment fragment = new LocationListFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_location_list);
+    }
 
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.list);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        final View rootView = inflater.inflate(R.layout.fragment_location_list, container, false);
+
+        RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.list);
         LocationAdapter adapter = new LocationAdapter(Model.INSTANCE.getLocations());
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(adapter);
 
         if (adapter.getItemCount() == 0) {
             readFile();
         }
 
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Donation Centers");
+        setActionBarTitle("Donation Centers");
+        setActionBarSubtitle("");
+
+        return rootView;
     }
 
     /**
@@ -56,7 +84,7 @@ public class LocationListActivity extends AppCompatActivity {
             String line;
             br.readLine(); //get rid of header line
             while ((line = br.readLine()) != null) {
-                Log.d(TAG, line);
+                Log.d("LocationListFragment", line);
                 String[] tokens = line.split(",");
                 int id = Integer.parseInt(tokens[0]);
                 String name = tokens[1];
@@ -73,7 +101,7 @@ public class LocationListActivity extends AppCompatActivity {
             }
             br.close();
         } catch (IOException e) {
-            Log.e(TAG, "error reading assets", e);
+            Log.e("LocationListFragment", "error reading assets", e);
         }
     }
 
@@ -95,7 +123,7 @@ public class LocationListActivity extends AppCompatActivity {
 
         // Replace the contents of a view (invoked by the layout manager)
         @Override
-        public void onBindViewHolder(final MyViewHolder holder, int position) {
+        public void onBindViewHolder(final LocationAdapter.MyViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
             holder.mLocation = mLocations.get(position);
@@ -104,11 +132,10 @@ public class LocationListActivity extends AppCompatActivity {
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Context context = v.getContext();
-                    Intent intent = new Intent(context, LocationDetailActivity.class);
-                    intent.putExtra(LocationDetailFragment.ARG_ITEM_ID, holder.mLocation.getId());
-                    intent.putExtra(LocationDetailFragment.ARG_LOCATION, holder.mLocation);
-                    context.startActivity(intent);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(LocationDetailFragment.ARG_LOCATION, holder.mLocation);
+
+                    NavHostFragment.findNavController(getParentFragment()).navigate(R.id.action_locationListFragment_to_locationDetailFrag, bundle);
                 }
             });
         }

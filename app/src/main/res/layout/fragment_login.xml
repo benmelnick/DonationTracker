@@ -7,8 +7,8 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:padding="16dp"
-    tools:context=".LoginActivity">
-
+    android:background="@android:color/background_light"
+    tools:context=".LoginFragment">
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/emailLayout"
@@ -81,6 +81,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
 
 </android.support.constraint.ConstraintLayout>

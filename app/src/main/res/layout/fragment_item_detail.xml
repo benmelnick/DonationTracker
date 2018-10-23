@@ -4,23 +4,17 @@
     android:id="@+id/linear"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="10dp"
+    android:background="@android:color/background_light"
     android:orientation="vertical"
-    tools:context=".LocationDetailActivity">
-
-    <TextView
-        android:id="@+id/short_description"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="20sp" />
+    android:padding="16dp"
+    tools:context=".ItemDetailFragment">
 
     <TextView
         android:id="@+id/full_description"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:text="Description"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="20sp" />
 
@@ -29,6 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:text="Timestamp"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="20sp" />
 
@@ -37,6 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:text="Price"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="20sp" />
 
@@ -45,6 +41,8 @@
         android:layout_width="match_parent"
         android:layout_height="9dp"
         android:layout_weight="1"
+        android:text="Category"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="20sp" />
+
 </LinearLayout>

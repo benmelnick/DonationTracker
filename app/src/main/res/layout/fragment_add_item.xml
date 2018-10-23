@@ -4,11 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginTop="24dp"
-    android:layout_marginRight="16dp"
-    android:layout_marginBottom="24dp"
-    tools:context=".AddItemActivity">
+    android:padding="16dp"
+    android:background="@android:color/background_light"
+    tools:context=".AddItemFragment">
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/shortLayout"
@@ -62,18 +60,20 @@
 
     <Spinner
         android:id="@+id/category"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:entries="@array/add_item_types"
+        android:prompt="@string/add_item_types_prompt"
+        android:spinnerMode="dialog"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/valueLayout" />
 
     <Button
         android:id="@+id/submit"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="validateForm"
         android:text="@string/add_submit_inventory"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

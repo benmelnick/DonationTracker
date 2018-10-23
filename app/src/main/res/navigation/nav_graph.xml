@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/LoginFragment">
+
+    <fragment
+        android:id="@+id/RegisterFragment"
+        android:name="com.example.benmelnick.donationtracker.RegisterFragment"
+        android:label="fragment_register"
+        tools:layout="@layout/fragment_register">
+        <action
+            android:id="@+id/action_registerFragment_to_postLoginFragment"
+            app:destination="@id/PostLoginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/PostLoginFragment"
+        android:name="com.example.benmelnick.donationtracker.PostLoginFragment"
+        android:label="fragment_post_login"
+        tools:layout="@layout/fragment_post_login">
+        <action
+            android:id="@+id/action_postLoginFragment_to_locationListFragment"
+            app:destination="@id/LocationListFragment" />
+        <action
+            android:id="@+id/action_postLoginFragment_to_loginFragment"
+            app:destination="@id/LoginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/LocationListFragment"
+        android:name="com.example.benmelnick.donationtracker.LocationListFragment"
+        android:label="fragment_location_list"
+        tools:layout="@layout/fragment_location_list">
+        <action
+            android:id="@+id/action_locationListFragment_to_locationDetailFrag"
+            app:destination="@id/LocationDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/LocationDetailFragment"
+        android:name="com.example.benmelnick.donationtracker.LocationDetailFragment"
+        android:label="fragment_location_detail"
+        tools:layout="@layout/fragment_location_detail">
+        <action
+            android:id="@+id/action_locationDetailFragment_to_inventoryListFragment"
+            app:destination="@id/InventoryListFragment" />
+        <argument
+            android:name="location"
+            app:argType="reference" />
+    </fragment>
+    <fragment
+        android:id="@+id/LoginFragment"
+        android:name="com.example.benmelnick.donationtracker.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_postLoginFragment"
+            app:destination="@id/PostLoginFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/RegisterFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/InventoryListFragment"
+        android:name="com.example.benmelnick.donationtracker.InventoryListFragment"
+        android:label="fragment_inventory_list"
+        tools:layout="@layout/fragment_inventory_list">
+        <action
+            android:id="@+id/action_inventoryListFragment_to_itemDetailFrag"
+            app:destination="@id/ItemDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <argument
+            android:name="location"
+            app:argType="reference" />
+        <action
+            android:id="@+id/action_inventoryListFragment_to_addItemFragment"
+            app:destination="@id/AddItemFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/AddItemFragment"
+        android:name="com.example.benmelnick.donationtracker.AddItemFragment"
+        android:label="fragment_add_item"
+        tools:layout="@layout/fragment_add_item" />
+    <fragment
+        android:id="@+id/ItemDetailFragment"
+        android:name="com.example.benmelnick.donationtracker.ItemDetailFragment"
+        android:label="fragment_item_detail"
+        tools:layout="@layout/fragment_item_detail">
+        <argument
+            android:name="item"
+            app:argType="reference" />
+    </fragment>
+</navigation>
