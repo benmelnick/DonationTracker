@@ -28,10 +28,12 @@ public class SearchResultsActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private String locationName; //location we are searching
     private String item; //item we are searching
+    private String category; //category we are searching
     private final ArrayList<Item> mItems = new ArrayList<>(); //list of items that match the search
 
     private RecyclerView mRecyclerView;
     private ItemAdapter adapter;
+    private TextView description;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +42,18 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+        //TODO: initialize the chosen category
         locationName = getIntent().getStringExtra("location");
         item = getIntent().getStringExtra("item");
+        category = getIntent().getStringExtra("category");
 
-        TextView description = (TextView)findViewById(R.id.description);
-        description.setText("Search results for '" + item + "' in '" + locationName + "'");
+        description = (TextView)findViewById(R.id.description);
 
         //populate mItems
         getResults();
+        if (mItems.size() == 0) {
+            //TODO : implement toast if nothing was found
+        }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -64,6 +70,26 @@ public class SearchResultsActivity extends AppCompatActivity {
      * otherwise, search the children of the specific location's inventory database
      */
     private void getResults() {
+        if (category.equals("Choose a category")) {
+            //only an item is entered
+            description.setText("Results for item '" + item + "' in " + locationName);
+            searchItemOnly();
+        } else if (item.equals("")) {
+            //only a category is entered
+            description.setText("Results for category '" + category + "' in " + locationName);
+            searchCategoryOnly();
+        } else {
+            //both are entered
+            description.setText("Results for item '" + item + "' in category '" + category + "' in " + locationName);
+        }
+
+    }
+
+    /**
+     * searches through the database checking only for the name of the item
+     * for this case, the category is left blank, and only the item is checked
+     */
+    private void searchItemOnly() {
         if (locationName.equals("All locations")) {
             //search across all locations
             mDatabase.child("locations").addValueEventListener(new ValueEventListener() {
@@ -71,7 +97,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
                         //go into location's data - iterate through inventory
-
+                        //TODO: implement item search for all locations
                     }
                 }
 
@@ -96,6 +122,108 @@ public class SearchResultsActivity extends AppCompatActivity {
                             Item item = new Item(timeStamp, shortDescription, fullDescription, value, category);
                             System.out.println("found " + item.getShortDescription() + "^^^^^^^^^^^^^^^");
                             mItems.add(item);
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    /**
+     * searches through the database checking only for the chosen category
+     * for this case, the item is left blank, and only the category is checked
+     */
+    private void searchCategoryOnly() {
+        if (locationName.equals("All locations")) {
+            //search across all locations
+            mDatabase.child("locations").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        //go into location's data - iterate through inventory
+                        //TODO: implement category search for all locations
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        } else {
+            //search specific location
+            mDatabase.child("locations").child(locationName).child("inventory").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        if (ds.child("category").getValue().toString().equals(category)) {
+                            //found the item - add to the list
+                            String timeStamp = ds.child("timeStamp").getValue().toString();
+                            String shortDescription = ds.child("shortDescription").getValue().toString();
+                            String fullDescription = ds.child("fullDescription").getValue().toString();
+                            double value = Double.valueOf(ds.child("value").getValue().toString());
+                            String category = ds.child("category").getValue().toString();
+                            Item item = new Item(timeStamp, shortDescription, fullDescription, value, category);
+                            System.out.println("found " + item.getShortDescription() + "^^^^^^^^^^^^^^^");
+                            mItems.add(item);
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    /**
+     * searches through the database checking for both fields
+     */
+    private void searchItemAndCategory() {
+        if (locationName.equals("All locations")) {
+            //search across all locations
+            mDatabase.child("locations").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        //go into location's data - iterate through inventory
+                        //TODO: implement category and item search for all locations
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        } else {
+            //search specific location
+            mDatabase.child("locations").child(locationName).child("inventory").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        if (ds.child("shortDescription").getValue().toString().equals(item)
+                                && ds.child("category").getValue().toString().equals(category)) {
+                            //found the item - add to the list
+                            //TODO: debug this case - not working
+                            String timeStamp = ds.child("timeStamp").getValue().toString();
+                            String shortDescription = ds.child("shortDescription").getValue().toString();
+                            String fullDescription = ds.child("fullDescription").getValue().toString();
+                            double value = Double.valueOf(ds.child("value").getValue().toString());
+                            String category = ds.child("category").getValue().toString();
+                            Item item = new Item(timeStamp, shortDescription, fullDescription, value, category);
+                            System.out.println("found " + item.getShortDescription() + "^^^^^^^^^^^^^^^");
+                            mItems.add(item);
+                            adapter.notifyDataSetChanged();
                         }
                     }
                 }
@@ -117,7 +245,7 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         // Create new views (invoked by the layout manager)
         @Override
-        public ItemAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             // create a new view
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.inventory_list_item, parent, false);
@@ -126,7 +254,7 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         // Replace the contents of a view (invoked by the layout manager)
         @Override
-        public void onBindViewHolder(final ItemAdapter.MyViewHolder holder, int position) {
+        public void onBindViewHolder(final MyViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
             holder.mItem = mItems.get(position);

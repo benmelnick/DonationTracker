@@ -42,4 +42,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemLayout" />
+
+    <Spinner
+        android:id="@+id/category_spinner"
+        android:layout_width="346dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="52dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/location_spinner" />
 </android.support.constraint.ConstraintLayout>
