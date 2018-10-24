@@ -88,7 +88,6 @@ public class LocationDetailFragment extends Fragment {
 
                     if (value.equals("Location Employee")) {
                         addBttn.setVisibility(View.VISIBLE);
-                        inventoryBttn.setVisibility(View.VISIBLE);
                     }
                 }
                 @Override

@@ -28,8 +28,9 @@
         <activity android:name=".LocationListActivity" />
         <activity android:name=".LocationDetailActivity" />
         <activity android:name=".AddItemActivity" />
-        <activity android:name=".InventoryListActivity"></activity>
+        <activity android:name=".InventoryListActivity" />
         <activity android:name=".ItemDetailActivity" />
+        <activity android:name=".SearchActivity"></activity>
     </application>
 
 </manifest>

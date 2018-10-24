@@ -74,8 +74,7 @@ public class InventoryListActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(InventoryListActivity.this, "The inventory data could not be loaded at this time!",
-                        Toast.LENGTH_LONG).show();
+
             }
         });
 
