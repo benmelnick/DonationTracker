@@ -30,7 +30,8 @@
         <activity android:name=".AddItemActivity" />
         <activity android:name=".InventoryListActivity" />
         <activity android:name=".ItemDetailActivity" />
-        <activity android:name=".SearchActivity"></activity>
+        <activity android:name=".SearchActivity" />
+        <activity android:name=".SearchResultsActivity"></activity>
     </application>
 
 </manifest>
