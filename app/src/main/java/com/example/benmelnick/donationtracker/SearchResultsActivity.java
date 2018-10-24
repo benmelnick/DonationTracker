@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.LinearLayoutManager;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -42,7 +43,6 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        //TODO: initialize the chosen category
         locationName = getIntent().getStringExtra("location");
         item = getIntent().getStringExtra("item");
         category = getIntent().getStringExtra("category");
@@ -52,7 +52,8 @@ public class SearchResultsActivity extends AppCompatActivity {
         //populate mItems
         getResults();
         if (mItems.size() == 0) {
-            //TODO : implement toast if nothing was found
+            Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
+                    Toast.LENGTH_LONG).show();
         }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
