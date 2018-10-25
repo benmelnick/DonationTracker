@@ -60,7 +60,8 @@ public class InventoryListActivity extends AppCompatActivity {
                     String fullDescription = ds.child("fullDescription").getValue().toString();
                     double value = Double.valueOf(ds.child("value").getValue().toString());
                     String category = ds.child("category").getValue().toString();
-                    Item item = new Item(timeStamp, shortDescription, fullDescription, value, category);
+                    String location = ds.child("location").getValue().toString();
+                    Item item = new Item(timeStamp, shortDescription, fullDescription, value, category, location);
 
                     mItems.add(item);
                     adapter.notifyDataSetChanged();

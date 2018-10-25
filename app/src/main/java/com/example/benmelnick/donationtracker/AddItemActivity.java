@@ -111,6 +111,7 @@ public class AddItemActivity extends AppCompatActivity {
         String fullDescription = mFull.getText().toString();
         double value = Double.parseDouble(mValue.getText().toString());
         String category = mCategory.getSelectedItem().toString();
+        String location = mLocation.getName();
         SimpleDateFormat dateFormat;
 
         //need time stamp
@@ -124,7 +125,7 @@ public class AddItemActivity extends AppCompatActivity {
         }
 
         //add new item to database
-        Item item = new Item(currentDate, shortDescription, fullDescription, value, category);
+        Item item = new Item(currentDate, shortDescription, fullDescription, value, category, location);
 
         //updates info for location
         //mDatabase.child("locations").child(mLocation.getName()).setValue(mLocation);

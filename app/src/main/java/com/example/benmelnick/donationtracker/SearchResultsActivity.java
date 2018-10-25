@@ -28,6 +28,7 @@ public class SearchResultsActivity extends AppCompatActivity {
 
     private DatabaseReference mDatabase;
     private String locationName; //location we are searching
+    //one of these guaranteed to exist
     private String item; //item we are searching
     private String category; //category we are searching
     private final ArrayList<Item> mItems = new ArrayList<>(); //list of items that match the search
@@ -51,10 +52,6 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         //populate mItems
         getResults();
-        if (mItems.size() == 0) {
-            Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
-                    Toast.LENGTH_LONG).show();
-        }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -82,9 +79,11 @@ public class SearchResultsActivity extends AppCompatActivity {
         } else {
             //both are entered
             description.setText("Results for item '" + item + "' in category '" + category + "' in " + locationName);
+            searchItemAndCategory();
         }
-
     }
+
+    //TODO: change all methods below so that they are not case sensitive
 
     /**
      * searches through the database checking only for the name of the item
@@ -97,8 +96,25 @@ public class SearchResultsActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        //go into location's data - iterate through inventory
-                        //TODO: implement item search for all locations
+                        //now looking at a specific location's data
+                        String name = ds.child("name").getValue().toString();
+                        mDatabase.child("locations").child(name).child("inventory").addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                    checkCurrentInventoryItem(ds, "shortDescription", item);
+                                }
+                                if (mItems.size() == 0) {
+                                    Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 }
 
@@ -113,18 +129,11 @@ public class SearchResultsActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        if (ds.child("shortDescription").getValue().toString().equals(item)) {
-                            //found the item - add to the list
-                            String timeStamp = ds.child("timeStamp").getValue().toString();
-                            String shortDescription = ds.child("shortDescription").getValue().toString();
-                            String fullDescription = ds.child("fullDescription").getValue().toString();
-                            double value = Double.valueOf(ds.child("value").getValue().toString());
-                            String category = ds.child("category").getValue().toString();
-                            Item item = new Item(timeStamp, shortDescription, fullDescription, value, category);
-                            System.out.println("found " + item.getShortDescription() + "^^^^^^^^^^^^^^^");
-                            mItems.add(item);
-                            adapter.notifyDataSetChanged();
-                        }
+                        checkCurrentInventoryItem(ds, "shortDescription", item);
+                    }
+                    if (mItems.size() == 0) {
+                        Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
+                                Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -147,8 +156,25 @@ public class SearchResultsActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        //go into location's data - iterate through inventory
-                        //TODO: implement category search for all locations
+                        //now looking at a specific location's data
+                        String name = ds.child("name").getValue().toString();
+                        mDatabase.child("locations").child(name).child("inventory").addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                    checkCurrentInventoryItem(ds, "category", category);
+                                }
+                                if (mItems.size() == 0) {
+                                    Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 }
 
@@ -163,18 +189,11 @@ public class SearchResultsActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        if (ds.child("category").getValue().toString().equals(category)) {
-                            //found the item - add to the list
-                            String timeStamp = ds.child("timeStamp").getValue().toString();
-                            String shortDescription = ds.child("shortDescription").getValue().toString();
-                            String fullDescription = ds.child("fullDescription").getValue().toString();
-                            double value = Double.valueOf(ds.child("value").getValue().toString());
-                            String category = ds.child("category").getValue().toString();
-                            Item item = new Item(timeStamp, shortDescription, fullDescription, value, category);
-                            System.out.println("found " + item.getShortDescription() + "^^^^^^^^^^^^^^^");
-                            mItems.add(item);
-                            adapter.notifyDataSetChanged();
-                        }
+                        checkCurrentInventoryItem(ds, "category", category);
+                    }
+                    if (mItems.size() == 0) {
+                        Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
+                                Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -196,8 +215,38 @@ public class SearchResultsActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        //go into location's data - iterate through inventory
-                        //TODO: implement category and item search for all locations
+                        //now looking at a specific location's data
+                        String name = ds.child("name").getValue().toString();
+                        mDatabase.child("locations").child(name).child("inventory").addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                    if (ds.child("shortDescription").getValue().toString().equals(item)
+                                            && ds.child("category").getValue().toString().equals(category)) {
+                                        //found the item - add to the list
+                                        String timeStamp = ds.child("timeStamp").getValue().toString();
+                                        String shortDescription = ds.child("shortDescription").getValue().toString();
+                                        String fullDescription = ds.child("fullDescription").getValue().toString();
+                                        double value = Double.valueOf(ds.child("value").getValue().toString());
+                                        String category = ds.child("category").getValue().toString();
+                                        String location = ds.child("location").getValue().toString();
+                                        Item item = new Item(timeStamp, shortDescription, fullDescription, value, category, location);
+                                        System.out.println("found " + item.getShortDescription() + "^^^^^^^^^^^^^^^");
+                                        mItems.add(item);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                }
+                                if (mItems.size() == 0) {
+                                    Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 }
 
@@ -215,17 +264,21 @@ public class SearchResultsActivity extends AppCompatActivity {
                         if (ds.child("shortDescription").getValue().toString().equals(item)
                                 && ds.child("category").getValue().toString().equals(category)) {
                             //found the item - add to the list
-                            //TODO: debug this case - not working
                             String timeStamp = ds.child("timeStamp").getValue().toString();
                             String shortDescription = ds.child("shortDescription").getValue().toString();
                             String fullDescription = ds.child("fullDescription").getValue().toString();
                             double value = Double.valueOf(ds.child("value").getValue().toString());
                             String category = ds.child("category").getValue().toString();
-                            Item item = new Item(timeStamp, shortDescription, fullDescription, value, category);
+                            String location = ds.child("location").getValue().toString();
+                            Item item = new Item(timeStamp, shortDescription, fullDescription, value, category, location);
                             System.out.println("found " + item.getShortDescription() + "^^^^^^^^^^^^^^^");
                             mItems.add(item);
                             adapter.notifyDataSetChanged();
                         }
+                    }
+                    if (mItems.size() == 0) {
+                        Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
+                                Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -236,6 +289,29 @@ public class SearchResultsActivity extends AppCompatActivity {
             });
         }
     }
+
+    /**
+     * private helper method for examining the current inventory item
+     * @param ds datasnapshot representing the inventory item
+     * @param field represents the filter being applied either shortDescription or category
+     * @param value represents the actual value of the filer for ds
+     */
+    private void checkCurrentInventoryItem(DataSnapshot ds, String field, String value) {
+        if (ds.child(field).getValue().toString().equals(value)) {
+            //found the item - add to the list
+            String timeStamp = ds.child("timeStamp").getValue().toString();
+            String shortDescription = ds.child("shortDescription").getValue().toString();
+            String fullDescription = ds.child("fullDescription").getValue().toString();
+            double itemVal = Double.valueOf(ds.child("value").getValue().toString());
+            String category = ds.child("category").getValue().toString();
+            String location = ds.child("location").getValue().toString();
+            Item item = new Item(timeStamp, shortDescription, fullDescription, itemVal, category, location);
+            System.out.println("found " + item.getShortDescription() + "^^^^^^^^^^^^^^^");
+            mItems.add(item);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
 
     public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> {
         private List<Item> mItems;

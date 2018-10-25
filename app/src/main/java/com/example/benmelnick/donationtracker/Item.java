@@ -11,17 +11,19 @@ public class Item implements Serializable  {
     private String fullDescription;
     private double value;
     private String category;
+    private String location;
 
     public Item() {
 
     }
 
-    public Item(String t, String s, String f, double v, String c) {
+    public Item(String t, String s, String f, double v, String c, String l) {
         timeStamp = t;
         shortDescription = s;
         fullDescription = f;
         value = v;
         category = c;
+        location = l;
     }
 
     public String getTimeStamp() {
@@ -62,6 +64,10 @@ public class Item implements Serializable  {
 
     public void setCategory(String c) {
         category = c;
+    }
+
+    public String getLocation() {
+        return location;
     }
 
     @Override

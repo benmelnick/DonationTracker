@@ -54,6 +54,7 @@ public class ItemDetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.timestamp)).setText("Added:\n" + mItem.getTimeStamp());
             ((TextView) rootView.findViewById(R.id.value)).setText("Price:\n$" + price);
             ((TextView) rootView.findViewById(R.id.category)).setText("Category:\n" + mItem.getCategory());
+            ((TextView) rootView.findViewById(R.id.location)).setText("Can Be Found At:\n" + mItem.getLocation());
         } else {
             Toast.makeText(getContext(), "The item's information could not be loaded at this time!",
                     Toast.LENGTH_LONG).show();
