@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Button;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,6 +39,16 @@ public class LocationListActivity extends AppCompatActivity {
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("Donation Centers");
+
+        Button map = (Button)findViewById(R.id.map_button);
+        map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LocationListActivity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     /**

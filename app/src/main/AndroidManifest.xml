@@ -31,7 +31,8 @@
         <activity android:name=".InventoryListActivity" />
         <activity android:name=".ItemDetailActivity" />
         <activity android:name=".SearchActivity" />
-        <activity android:name=".SearchResultsActivity"></activity>
+        <activity android:name=".SearchResultsActivity" />
+        <activity android:name=".MapActivity"></activity>
     </application>
 
 </manifest>
