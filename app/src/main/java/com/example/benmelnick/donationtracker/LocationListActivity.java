@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LocationListActivity extends AppCompatActivity {
@@ -45,6 +46,8 @@ public class LocationListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LocationListActivity.this, MapActivity.class);
+                Model model = Model.INSTANCE;
+                intent.putExtra("Locations", new ArrayList<>(model.getLocations()));
                 startActivity(intent);
             }
         });
