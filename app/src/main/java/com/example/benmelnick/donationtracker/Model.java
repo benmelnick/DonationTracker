@@ -33,4 +33,8 @@ public class Model {
         Log.d("MYAPP", "Warning - Failed to find id: " + id);
         return null;
     }
+
+    public boolean isEmpty() {
+        return locations.isEmpty();
+    }
 }
