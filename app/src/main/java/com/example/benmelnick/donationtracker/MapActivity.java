@@ -1,5 +1,6 @@
 package com.example.benmelnick.donationtracker;
 
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
+/**
+ * The activity which shows a map of donation centers
+ */
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
     private List<Location> locations;
 
@@ -24,22 +28,32 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_map);
         // Get the SupportMapFragment and request notification
         // when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) fragmentManager.findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
 
         locations = Model.INSTANCE.getLocations();
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        if (locations.size() > 0) {
+        if (!locations.isEmpty()) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
             LatLng coordinates = null;
             for (Location donationCenter : locations) {
-                coordinates = new LatLng(donationCenter.getLatitude(), donationCenter.getLongitude());
-                googleMap.addMarker(new MarkerOptions().position(coordinates).title(donationCenter.getName()).snippet(donationCenter.getPhoneNumber()));
+                coordinates = new LatLng(donationCenter.getLatitude(),
+                        donationCenter.getLongitude());
+
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(coordinates);
+                markerOptions.title(donationCenter.getName());
+                markerOptions.snippet(donationCenter.getPhoneNumber());
+
+                googleMap.addMarker(markerOptions);
                 builder.include(coordinates);
             }
 
@@ -48,7 +62,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0));
                 googleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
             } catch (Exception e) {
-                Log.e("MapActivity", "Failed setting map bounds to all markers, falling back to last marker.");
+                Log.e("MapActivity",
+                        "Failed setting map bounds to all markers, using fall back.");
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(coordinates));
             }
         }

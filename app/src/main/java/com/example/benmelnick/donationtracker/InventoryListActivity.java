@@ -13,11 +13,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
@@ -29,12 +27,8 @@ import java.util.ArrayList;
  */
 public class InventoryListActivity extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
-    private DatabaseReference mDatabase;
-    private Location mLocation; //reference to the current location
     private final ArrayList<Item> mItems = new ArrayList<>();
 
-    private RecyclerView mRecyclerView;
     private ItemAdapter adapter;
 
 
@@ -44,32 +38,58 @@ public class InventoryListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_inventory_list);
 
         //define the location being referenced
-        int locationId = getIntent().getIntExtra("id", 0);
-        mLocation = Model.INSTANCE.findLocationById(locationId);
+        Intent intent = getIntent();
+        int locationId = intent.getIntExtra("id", 0);
+        Location mLocation = Model.INSTANCE.findLocationById(locationId);
 
-        mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        // FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        // DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        String locName = null;
+        if (mLocation != null) {
+            //noinspection LawOfDemeter
+            locName = mLocation.getName();
+        }
 
         //read all the inventory from the database - add to array list for displaying
-        mDatabase.child("locations").child(mLocation.getName()).child("inventory").addValueEventListener(new ValueEventListener() {
+        DatabaseReference invRef = FirebaseHelper.INSTANCE.getDatabaseReference(
+                "locations", locName, "inventory");
+        invRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    String timeStamp = ds.child("timeStamp").getValue().toString();
-                    String shortDescription = ds.child("shortDescription").getValue().toString();
-                    String fullDescription = ds.child("fullDescription").getValue().toString();
-                    double value = Double.valueOf(ds.child("value").getValue().toString());
-                    String category = ds.child("category").getValue().toString();
-                    String location = ds.child("location").getValue().toString();
-                    Item item = new Item(timeStamp, shortDescription, fullDescription, value, category, location);
+                    DataSnapshot timeSnap = ds.child("timeStamp");
+                    String timeStamp = timeSnap.getValue(String.class);
 
-                    mItems.add(item);
-                    adapter.notifyDataSetChanged();
+                    DataSnapshot shortSnap = ds.child("shortDescription");
+                    String shortDescription = shortSnap.getValue(String.class);
+
+                    DataSnapshot fullSnap = ds.child("fullDescription");
+                    String fullDescription = fullSnap.getValue(String.class);
+
+                    DataSnapshot valueSnap = ds.child("value");
+                    Double value = valueSnap.getValue(Double.class);
+
+                    DataSnapshot catSnap = ds.child("category");
+                    String category = catSnap.getValue(String.class);
+
+                    DataSnapshot locSnap = ds.child("location");
+                    String location = locSnap.getValue(String.class);
+
+                    if (value != null) {
+                        Item item = new Item(timeStamp, shortDescription,
+                                fullDescription, value, category, location);
+
+                        mItems.add(item);
+                        adapter.notifyDataSetChanged();
+                    }
                 }
 
-                if (mItems.size() == 0) {
-                    Toast.makeText(InventoryListActivity.this, "This location does not have any items in its inventory!",
-                            Toast.LENGTH_LONG).show();
+                if (mItems.isEmpty()) {
+                    Toast toast = Toast.makeText(InventoryListActivity.this,
+                            "This location does not have any items in its inventory!",
+                            Toast.LENGTH_LONG);
+                    toast.show();
                 }
             }
 
@@ -79,38 +99,44 @@ public class InventoryListActivity extends AppCompatActivity {
             }
         });
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        RecyclerView mRecyclerView = findViewById(R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ItemAdapter(mItems);
         mRecyclerView.setAdapter(adapter);
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Inventory");
+        if (actionBar != null) {
+            actionBar.setTitle("Inventory");
+        }
     }
 
     public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> {
-        private List<Item> mItems;
+        private final List<Item> mItems;
         // Provide a suitable constructor (depends on the kind of dataset)
-        public ItemAdapter(List<Item> values) {
+        ItemAdapter(List<Item> values) {
             mItems = values;
         }
 
         // Create new views (invoked by the layout manager)
+        @NonNull
         @Override
-        public ItemAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public ItemAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                                           int viewType) {
             // create a new view
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.inventory_list_item, parent, false);
+            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+            View v = layoutInflater.inflate(
+                    R.layout.inventory_list_item, parent, false);
             return new MyViewHolder(v);
         }
 
         // Replace the contents of a view (invoked by the layout manager)
         @Override
-        public void onBindViewHolder(final MyViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
             holder.mItem = mItems.get(position);
-            holder.mContentView.setText(mItems.get(position).getShortDescription());
+            Item foundItem = mItems.get(position);
+            holder.mContentView.setText(foundItem.getShortDescription());
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -133,16 +159,17 @@ public class InventoryListActivity extends AppCompatActivity {
         // Complex data items may need more than one view per item, and
         // you provide access to all the views for a data item in a view holder
         public class MyViewHolder extends RecyclerView.ViewHolder {
-            public View mView;
-            public final TextView mContentView;
-            public Item mItem;
+            final View mView;
+            final TextView mContentView;
+            private Item mItem;
 
-            public MyViewHolder(View v) {
+            MyViewHolder(View v) {
                 super(v);
                 mView = v;
                 mContentView = v.findViewById(R.id.content);
             }
 
+            @NonNull
             @Override
             public String toString() {
                 return mContentView.getText() + "'";

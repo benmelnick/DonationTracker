@@ -1,40 +1,34 @@
 package com.example.benmelnick.donationtracker;
 
-import android.app.ActionBar;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.KeyEvent;
+import android.text.Editable;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.graphics.Color;
 import android.widget.Toast;
-import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import org.w3c.dom.Text;
+import com.google.firebase.auth.UserInfo;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executor;
 
+/**
+ * The activity for registering a new account
+ */
+@SuppressWarnings("CyclicClassDependency")
 public class RegisterActivity extends AppCompatActivity {
 
     private static final String TAG = "RegisterActivity";
@@ -48,7 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     //boolean to see if authentication has already been attempted
     private FirebaseAuth mAuth;
-    private DatabaseReference mDatabase;
+    //private DatabaseReference mDatabase;
 
     @Override
     public void onBackPressed() {
@@ -63,15 +57,16 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        //FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        //mDatabase = firebaseDatabase.getReference();
 
-        mEmail = (TextInputEditText) findViewById(R.id.register_email);
-        mPassword1 = (EditText) findViewById(R.id.register_password1);
-        mPassword2 = (EditText) findViewById(R.id.register_password2);
-        mName = (EditText) findViewById(R.id.register_name);
-        mType = (Spinner) findViewById(R.id.register_type);
+        mEmail = findViewById(R.id.register_email);
+        mPassword1 = findViewById(R.id.register_password1);
+        mPassword2 = findViewById(R.id.register_password2);
+        mName = findViewById(R.id.register_name);
+        mType = findViewById(R.id.register_type);
 
-        Button registerButton = (Button) findViewById(R.id.register_button);
+        Button registerButton = findViewById(R.id.register_button);
         registerButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,13 +74,17 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        List<String> legalAccounts = Arrays.asList("Choose an account", "Admin", "Manager", "Location Employee", "User");
-        ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, legalAccounts);
+        List<String> legalAccounts = Arrays.asList("Choose an account", "Admin",
+                "Manager", "Location Employee", "User");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, legalAccounts);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mType.setAdapter(adapter);
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Register");
+        if (actionBar != null) {
+            actionBar.setTitle("Register");
+        }
     }
 
     /**
@@ -100,121 +99,106 @@ public class RegisterActivity extends AppCompatActivity {
         mPassword2.setError(null);
         mName.setError(null);
 
-        // Store values at the time of the login attempt.
-        String email = mEmail.getText().toString();
-        String password1 = mPassword1.getText().toString();
-        String password2 = mPassword2.getText().toString();
-        String name = mName.getText().toString();
+        Editable emailText = mEmail.getText();
+        Editable passwordText = mPassword1.getText();
+        Editable passwordConfText = mPassword2.getText();
+        Editable nameText = mName.getText();
+        Object mTypeSelected = mType.getSelectedItem();
 
-        boolean cancel = false;
-        View focusView = null;
-
-        //check for a name
-        if (TextUtils.isEmpty(name)) {
-            mName.setError("This field is required.");
-            focusView = mName;
-            cancel = true;
-        }
-
-        //check for valid account type
-        if(mType.getSelectedItem().toString().equals("Choose an account type")) {
-            ((TextView)mType.getSelectedView()).setError("Must select an account type");
-            focusView = mType;
-            cancel = true;
-        }
-
-        // Check for a valid password, if the user entered one.
-        if (TextUtils.isEmpty(password1)) {
-            mPassword1.setError(getString(R.string.error_field_required));
-            focusView = mPassword1;
-            cancel = true;
-        }
-        if (TextUtils.isEmpty(password2)) {
-            mPassword2.setError(getString(R.string.error_field_required));
-            focusView = mPassword2;
-            cancel = true;
-        }
-        if (!TextUtils.isEmpty(password1) && !isPasswordValid(password1)) {
-            mPassword1.setError(getString(R.string.error_invalid_password));
-            focusView = mPassword1;
-            cancel = true;
-        }
-        if (!TextUtils.isEmpty(password2) && !isPasswordValid(password2)) {
-            mPassword2.setError(getString(R.string.error_invalid_password));
-            focusView = mPassword2;
-            cancel = true;
-        }
-        if (!password1.equals(password2)) {
-            mPassword1.setError("Passwords must match.");
-            focusView = mPassword1;
-            cancel = true;
-        }
-
-        // Check for a valid email
-        if (TextUtils.isEmpty(email)) {
-            mEmail.setError(getString(R.string.error_field_required));
-            focusView = mEmail;
-            cancel = true;
-        }
-        if (!isEmailValid(email)) {
-            mEmail.setError(getString(R.string.error_invalid_email));
-            focusView = mEmail;
-            cancel = true;
-        }
-
-        if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
-            focusView.requestFocus();
-        } else {
-            signUp();
+        if ((emailText != null) && (passwordText != null)
+                && (passwordConfText != null) && (nameText != null) && (mTypeSelected != null)) {
+            //check for a name
+            if (nameText.length() == 0) {
+                mName.setError("This field is required.");
+                mName.requestFocus();
+            } else if ("Choose an account type".equals(mTypeSelected.toString())) {
+                ((TextView) mType.getSelectedView()).setError("Must select an account type");
+                mType.requestFocus();
+            } else if (passwordText.length() == 0) {
+                mPassword1.setError("This field is required");
+                mPassword1.requestFocus();
+            } else if (passwordConfText.length() == 0) {
+                mPassword2.setError("This field is required");
+                mPassword2.requestFocus();
+            } else if (isPasswordInvalid(passwordText)) {
+                mPassword1.setError("This password is too short");
+                mPassword1.requestFocus();
+            } else if (!passwordText.equals(passwordConfText)) {
+                mPassword2.setError("Passwords must match.");
+                mPassword2.requestFocus();
+            } else if (isEmailInvalid(emailText)) {
+                mEmail.setError("This email address is invalid");
+                mEmail.requestFocus();
+            } else {
+                signUp();
+            }
         }
     }
 
     private void signUp() {
-        String email = mEmail.getText().toString();
-        String password = mPassword1.getText().toString();
+        Editable emailText = mEmail.getText();
+        Editable passwordText = mPassword1.getText();
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "createUser:onComplete:" + task.isSuccessful());
+        if ((emailText != null) && (passwordText != null)) {
+            String email = emailText.toString();
+            String password = passwordText.toString();
 
-                        if (task.isSuccessful()) {
-                            onAuthSuccess(task.getResult().getUser());
-                        } else {
-                            Toast.makeText(RegisterActivity.this, "Sign Up Failed",
-                                    Toast.LENGTH_SHORT).show();
-                            Log.d(TAG, task.getException().toString());
+            Task<AuthResult> registerTask = mAuth.createUserWithEmailAndPassword(email, password);
+
+            registerTask.addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    Log.d(TAG, "createUser:onComplete:" + task.isSuccessful());
+
+                    if (task.isSuccessful()) {
+                        AuthResult result = task.getResult();
+
+                        if (result != null) {
+                            onAuthSuccess(result.getUser());
                         }
+                    } else {
+                        Toast toast = Toast.makeText(RegisterActivity.this,
+                                "Sign Up Failed", Toast.LENGTH_SHORT);
+                        toast.show();
                     }
-                });
+                }
+            });
+        }
     }
 
-    private void onAuthSuccess(FirebaseUser user) {
-        //create new user and add to database
-        String id = user.getUid();
-        String email = user.getEmail();
-        String name = mName.getText().toString();
-        String type = mType.getSelectedItem().toString();
-        User newUser = new User(id, email, name, type);
+    private void onAuthSuccess(UserInfo user) {
+        Editable mNameText = mName.getText();
+        Object mTypeSelected = mType.getSelectedItem();
 
-        mDatabase.child("users").child(id).setValue(newUser);
+        if ((mNameText != null) && (mTypeSelected != null)) {
+            //create new user and add to database
+            String id = user.getUid();
+            String email = user.getEmail();
+            String name = mNameText.toString();
+            String type = mTypeSelected.toString();
+            User newUser = new User(id, email, name, type);
 
-        // Go to MainActivity
-        startActivity(new Intent(RegisterActivity.this, MainContentActivity.class));
-        finish();
+            //mDatabase.child("users").child(id).setValue(newUser);
+            //FirebaseHelper.INSTANCE.getDatabaseReference("users", id).setValue(newUser);
+            FirebaseHelper.INSTANCE.setDatabaseValue(newUser, "users", id);
+
+            // Go to MainActivity
+            startActivity(new Intent(RegisterActivity.this, MainContentActivity.class));
+            finish();
+        }
     }
 
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
+    private boolean isPasswordInvalid(CharSequence password) {
+        return (password == null) || (password.length() <= 4);
     }
 
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
+    private boolean isEmailInvalid(CharSequence email) {
+        if ((email == null) || (email.length() <= 5)) {
+            return true;
+        } else {
+            String emailString = email.toString();
+            return !emailString.contains("@");
+        }
     }
 
 }

@@ -2,38 +2,38 @@ package com.example.benmelnick.donationtracker;
 
 import android.content.Context;
 import android.content.Intent;
-import android.provider.ContactsContract;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.LinearLayoutManager;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The activity which shows results from a search request
+ */
 public class SearchResultsActivity extends AppCompatActivity {
 
-    private DatabaseReference mDatabase;
+    private DatabaseReference locsRef;
+
     private String locationName; //location we are searching
     //one of these guaranteed to exist
     private String item; //item we are searching
     private String category; //category we are searching
     private final ArrayList<Item> mItems = new ArrayList<>(); //list of items that match the search
 
-    private RecyclerView mRecyclerView;
     private ItemAdapter adapter;
     private TextView description;
 
@@ -42,24 +42,27 @@ public class SearchResultsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_results);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        this.locsRef = FirebaseHelper.INSTANCE.getDatabaseReference("locations");
 
-        locationName = getIntent().getStringExtra("location");
-        item = getIntent().getStringExtra("item");
-        category = getIntent().getStringExtra("category");
+        Intent intent = getIntent();
+        locationName = intent.getStringExtra("location");
+        item = intent.getStringExtra("item");
+        category = intent.getStringExtra("category");
 
-        description = (TextView)findViewById(R.id.description);
+        description = findViewById(R.id.description);
 
         //populate mItems
         getResults();
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        RecyclerView mRecyclerView = findViewById(R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ItemAdapter(mItems);
         mRecyclerView.setAdapter(adapter);
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Inventory");
+        if (actionBar != null) {
+            actionBar.setTitle("Inventory");
+        }
     }
 
     /**
@@ -68,45 +71,54 @@ public class SearchResultsActivity extends AppCompatActivity {
      * otherwise, search the children of the specific location's inventory database
      */
     private void getResults() {
-        if (category.equals("Choose a category")) {
+        if ("Choose a category".equals(category)) {
             //only an item is entered
-            description.setText("Results for item '" + item + "' in " + locationName);
+            String newText = "Results for item '" + item + "' in " + locationName;
+            description.setText(newText);
             searchItemOnly();
-        } else if (item.equals("")) {
+        } else if ("".equals(item)) {
             //only a category is entered
-            description.setText("Results for category '" + category + "' in " + locationName);
+            String newText = "Results for category '" + category + "' in " + locationName;
+            description.setText(newText);
             searchCategoryOnly();
         } else {
             //both are entered
-            description.setText("Results for item '" + item + "' in category '" + category + "' in " + locationName);
+            String newText = "Results for item '" + item + "' in category '" + category
+                    + "' in " + locationName;
+            description.setText(newText);
             searchItemAndCategory();
         }
     }
-
-    //TODO: change all methods below so that they are not case sensitive
 
     /**
      * searches through the database checking only for the name of the item
      * for this case, the category is left blank, and only the item is checked
      */
     private void searchItemOnly() {
-        if (locationName.equals("All locations")) {
+        if ("All locations".equals(locationName)) {
             //search across all locations
-            mDatabase.child("locations").addValueEventListener(new ValueEventListener() {
+            locsRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
                         //now looking at a specific location's data
-                        String name = ds.child("name").getValue().toString();
-                        mDatabase.child("locations").child(name).child("inventory").addValueEventListener(new ValueEventListener() {
+                        DataSnapshot nameSnap = ds.child("name");
+                        String name = nameSnap.getValue(String.class);
+
+                        DatabaseReference invRef = FirebaseHelper.INSTANCE.getDatabaseReference(
+                                "locations", name, "inventory");
+                        invRef.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                                     checkCurrentInventoryItem(ds, "shortDescription", item);
                                 }
-                                if (mItems.size() == 0) {
-                                    Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
-                                            Toast.LENGTH_LONG).show();
+
+                                if (mItems.isEmpty()) {
+                                    Toast toast = Toast.makeText(SearchResultsActivity.this,
+                                            "No items matching the search fields were found.",
+                                            Toast.LENGTH_LONG);
+                                    toast.show();
                                 }
                             }
 
@@ -124,16 +136,22 @@ public class SearchResultsActivity extends AppCompatActivity {
                 }
             });
         } else {
+            DatabaseReference invRef = FirebaseHelper.INSTANCE.getDatabaseReference(
+                    "locations", locationName, "inventory");
+
             //search specific location
-            mDatabase.child("locations").child(locationName).child("inventory").addValueEventListener(new ValueEventListener() {
+            invRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
                         checkCurrentInventoryItem(ds, "shortDescription", item);
                     }
-                    if (mItems.size() == 0) {
-                        Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
-                                Toast.LENGTH_LONG).show();
+
+                    if (mItems.isEmpty()) {
+                        Toast toast = Toast.makeText(SearchResultsActivity.this,
+                                "No items matching the search fields were found.",
+                                Toast.LENGTH_LONG);
+                        toast.show();
                     }
                 }
 
@@ -150,23 +168,31 @@ public class SearchResultsActivity extends AppCompatActivity {
      * for this case, the item is left blank, and only the category is checked
      */
     private void searchCategoryOnly() {
-        if (locationName.equals("All locations")) {
+        if ("All locations".equals(locationName)) {
             //search across all locations
-            mDatabase.child("locations").addValueEventListener(new ValueEventListener() {
+            locsRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
                         //now looking at a specific location's data
-                        String name = ds.child("name").getValue().toString();
-                        mDatabase.child("locations").child(name).child("inventory").addValueEventListener(new ValueEventListener() {
+                        DataSnapshot nameSnap = ds.child("name");
+                        String name = nameSnap.getValue(String.class);
+
+                        DatabaseReference invRef = FirebaseHelper.INSTANCE.getDatabaseReference(
+                                "locations", name, "inventory");
+
+                        invRef.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                                     checkCurrentInventoryItem(ds, "category", category);
                                 }
-                                if (mItems.size() == 0) {
-                                    Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
-                                            Toast.LENGTH_LONG).show();
+
+                                if (mItems.isEmpty()) {
+                                    Toast toast = Toast.makeText(SearchResultsActivity.this,
+                                            "No items matching the search fields were found.",
+                                            Toast.LENGTH_LONG);
+                                    toast.show();
                                 }
                             }
 
@@ -185,15 +211,21 @@ public class SearchResultsActivity extends AppCompatActivity {
             });
         } else {
             //search specific location
-            mDatabase.child("locations").child(locationName).child("inventory").addValueEventListener(new ValueEventListener() {
+            DatabaseReference invRef = FirebaseHelper.INSTANCE.getDatabaseReference(
+                    "locations", locationName, "inventory");
+
+            invRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
                         checkCurrentInventoryItem(ds, "category", category);
                     }
-                    if (mItems.size() == 0) {
-                        Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
-                                Toast.LENGTH_LONG).show();
+
+                    if (mItems.isEmpty()) {
+                        Toast toast = Toast.makeText(SearchResultsActivity.this,
+                                "No items matching the search fields were found.",
+                                Toast.LENGTH_LONG);
+                        toast.show();
                     }
                 }
 
@@ -209,36 +241,58 @@ public class SearchResultsActivity extends AppCompatActivity {
      * searches through the database checking for both fields
      */
     private void searchItemAndCategory() {
-        if (locationName.equals("All locations")) {
+        if ("All locations".equals(locationName)) {
             //search across all locations
-            mDatabase.child("locations").addValueEventListener(new ValueEventListener() {
+            locsRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
                         //now looking at a specific location's data
-                        String name = ds.child("name").getValue().toString();
-                        mDatabase.child("locations").child(name).child("inventory").addValueEventListener(new ValueEventListener() {
+                        DataSnapshot nameSnap = ds.child("name");
+                        String name = nameSnap.getValue(String.class);
+
+                        DatabaseReference invRef = FirebaseHelper.INSTANCE.getDatabaseReference(
+                                "locations", name, "inventory");
+
+                        invRef.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                                    if (ds.child("shortDescription").getValue().toString().equals(item)
-                                            && ds.child("category").getValue().toString().equals(category)) {
+                                    DataSnapshot shortSnap = ds.child("shortDescription");
+                                    String shortDescription = shortSnap.getValue(String.class);
+
+                                    DataSnapshot catSnap = ds.child("category");
+                                    String category = catSnap.getValue(String.class);
+
+                                    if ((shortDescription != null) && shortDescription.equals(item)
+                                            && (category != null)) {
                                         //found the item - add to the list
-                                        String timeStamp = ds.child("timeStamp").getValue().toString();
-                                        String shortDescription = ds.child("shortDescription").getValue().toString();
-                                        String fullDescription = ds.child("fullDescription").getValue().toString();
-                                        double value = Double.valueOf(ds.child("value").getValue().toString());
-                                        String category = ds.child("category").getValue().toString();
-                                        String location = ds.child("location").getValue().toString();
-                                        Item item = new Item(timeStamp, shortDescription, fullDescription, value, category, location);
-                                        System.out.println("found " + item.getShortDescription() + "^^^^^^^^^^^^^^^");
-                                        mItems.add(item);
-                                        adapter.notifyDataSetChanged();
+                                        DataSnapshot timeSnap = ds.child("timeStamp");
+                                        String timeStamp = timeSnap.getValue(String.class);
+
+                                        DataSnapshot fullSnap = ds.child("fullDescription");
+                                        String fullDescription = fullSnap.getValue(String.class);
+
+                                        DataSnapshot valueSnap = ds.child("value");
+                                        Double value = valueSnap.getValue(Double.class);
+
+                                        DataSnapshot locSnap = ds.child("location");
+                                        String location = locSnap.getValue(String.class);
+
+                                        if (value != null) {
+                                            Item item = new Item(timeStamp, shortDescription,
+                                                    fullDescription, value, category, location);
+                                            mItems.add(item);
+                                            adapter.notifyDataSetChanged();
+                                        }
                                     }
                                 }
-                                if (mItems.size() == 0) {
-                                    Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
-                                            Toast.LENGTH_LONG).show();
+
+                                if (mItems.isEmpty()) {
+                                    Toast toast = Toast.makeText(SearchResultsActivity.this,
+                                            "No items matching the search fields were found.",
+                                            Toast.LENGTH_LONG);
+                                    toast.show();
                                 }
                             }
 
@@ -257,28 +311,47 @@ public class SearchResultsActivity extends AppCompatActivity {
             });
         } else {
             //search specific location
-            mDatabase.child("locations").child(locationName).child("inventory").addValueEventListener(new ValueEventListener() {
+            DatabaseReference invRef = FirebaseHelper.INSTANCE.getDatabaseReference(
+                    "locations", locationName, "inventory");
+            invRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        if (ds.child("shortDescription").getValue().toString().equals(item)
-                                && ds.child("category").getValue().toString().equals(category)) {
+                        DataSnapshot shortSnap = ds.child("shortDescription");
+                        String shortDescription = shortSnap.getValue(String.class);
+
+                        DataSnapshot catSnap = ds.child("category");
+                        String category = catSnap.getValue(String.class);
+
+                        if ((shortDescription != null) && shortDescription.equals(item)
+                                && (category != null)) {
                             //found the item - add to the list
-                            String timeStamp = ds.child("timeStamp").getValue().toString();
-                            String shortDescription = ds.child("shortDescription").getValue().toString();
-                            String fullDescription = ds.child("fullDescription").getValue().toString();
-                            double value = Double.valueOf(ds.child("value").getValue().toString());
-                            String category = ds.child("category").getValue().toString();
-                            String location = ds.child("location").getValue().toString();
-                            Item item = new Item(timeStamp, shortDescription, fullDescription, value, category, location);
-                            System.out.println("found " + item.getShortDescription() + "^^^^^^^^^^^^^^^");
-                            mItems.add(item);
-                            adapter.notifyDataSetChanged();
+
+                            DataSnapshot timeSnap = ds.child("timeStamp");
+                            String timeStamp = timeSnap.getValue(String.class);
+
+                            DataSnapshot fullSnap = ds.child("fullDescription");
+                            String fullDescription = fullSnap.getValue(String.class);
+
+                            DataSnapshot valueSnap = ds.child("value");
+                            Double value = valueSnap.getValue(Double.class);
+
+                            DataSnapshot locSnap = ds.child("location");
+                            String location = locSnap.getValue(String.class);
+
+                            if (value != null) {
+                                Item item = new Item(timeStamp, shortDescription,
+                                        fullDescription, value, category, location);
+                                mItems.add(item);
+                                adapter.notifyDataSetChanged();
+                            }
                         }
                     }
-                    if (mItems.size() == 0) {
-                        Toast.makeText(SearchResultsActivity.this, "No items matching the search fields were found.",
-                                Toast.LENGTH_LONG).show();
+                    if (mItems.isEmpty()) {
+                        Toast toast = Toast.makeText(SearchResultsActivity.this,
+                                "No items matching the search fields were found.",
+                                Toast.LENGTH_LONG);
+                        toast.show();
                     }
                 }
 
@@ -297,45 +370,69 @@ public class SearchResultsActivity extends AppCompatActivity {
      * @param value represents the actual value of the filer for ds
      */
     private void checkCurrentInventoryItem(DataSnapshot ds, String field, String value) {
-        if (ds.child(field).getValue().toString().equals(value)) {
-            //found the item - add to the list
-            String timeStamp = ds.child("timeStamp").getValue().toString();
-            String shortDescription = ds.child("shortDescription").getValue().toString();
-            String fullDescription = ds.child("fullDescription").getValue().toString();
-            double itemVal = Double.valueOf(ds.child("value").getValue().toString());
-            String category = ds.child("category").getValue().toString();
-            String location = ds.child("location").getValue().toString();
-            Item item = new Item(timeStamp, shortDescription, fullDescription, itemVal, category, location);
-            System.out.println("found " + item.getShortDescription() + "^^^^^^^^^^^^^^^");
-            mItems.add(item);
-            adapter.notifyDataSetChanged();
+        DataSnapshot fieldSnap = ds.child(field);
+        String fieldValue = fieldSnap.getValue(String.class);
+
+        if (fieldValue != null) {
+            if (fieldValue.equals(value)) {
+                //found the item - add to the list
+                DataSnapshot timeSnap = ds.child("timeStamp");
+                String timeStamp = timeSnap.getValue(String.class);
+
+                DataSnapshot shortSnap = ds.child("shortDescription");
+                String shortDescription = shortSnap.getValue(String.class);
+
+                DataSnapshot fullSnap = ds.child("fullDescription");
+                String fullDescription = fullSnap.getValue(String.class);
+
+                DataSnapshot valueSnap = ds.child("value");
+                Double itemVal = valueSnap.getValue(Double.class);
+
+                DataSnapshot categorySnap = ds.child("category");
+                String category = categorySnap.getValue(String.class);
+
+                DataSnapshot locSnap = ds.child("location");
+                String location = locSnap.getValue(String.class);
+
+                if (itemVal != null) {
+                    Item item = new Item(timeStamp, shortDescription, fullDescription,
+                            itemVal, category, location);
+                    mItems.add(item);
+                    adapter.notifyDataSetChanged();
+                }
+            }
         }
     }
 
 
     public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> {
-        private List<Item> mItems;
+        private final List<Item> mItems;
         // Provide a suitable constructor (depends on the kind of dataset)
-        public ItemAdapter(List<Item> values) {
+        ItemAdapter(List<Item> values) {
             mItems = values;
         }
 
         // Create new views (invoked by the layout manager)
+        @NonNull
         @Override
-        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             // create a new view
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.inventory_list_item, parent, false);
+            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+            View v = layoutInflater.inflate(
+                    R.layout.inventory_list_item, parent, false);
             return new ItemAdapter.MyViewHolder(v);
         }
 
         // Replace the contents of a view (invoked by the layout manager)
         @Override
-        public void onBindViewHolder(final MyViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
             holder.mItem = mItems.get(position);
-            holder.mContentView.setText(mItems.get(position).getShortDescription());
+
+            Item foundItem = mItems.get(position);
+
+            holder.mContentView.setText(foundItem.getShortDescription());
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -358,16 +455,17 @@ public class SearchResultsActivity extends AppCompatActivity {
         // Complex data items may need more than one view per item, and
         // you provide access to all the views for a data item in a view holder
         public class MyViewHolder extends RecyclerView.ViewHolder {
-            public View mView;
-            public final TextView mContentView;
-            public Item mItem;
+            final View mView;
+            final TextView mContentView;
+            private Item mItem;
 
-            public MyViewHolder(View v) {
+            MyViewHolder(View v) {
                 super(v);
                 mView = v;
                 mContentView = v.findViewById(R.id.content);
             }
 
+            @NonNull
             @Override
             public String toString() {
                 return mContentView.getText() + "'";

@@ -3,8 +3,10 @@ package com.example.benmelnick.donationtracker;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,10 +20,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.text.TextUtils;
+import android.text.Editable;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewPropertyAnimator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -44,6 +47,7 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
+@SuppressWarnings("CyclicClassDependency")
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     /**
@@ -71,22 +75,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mAuth = FirebaseAuth.getInstance();
 
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = findViewById(R.id.email);
         populateAutoComplete();
 
-        mPasswordView = (EditText) findViewById(R.id.password);
+        mPasswordView = findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                if ((id == EditorInfo.IME_ACTION_DONE) || (id == EditorInfo.IME_NULL)) {
                     attemptLogin();
                     return true;
                 }
+
                 return false;
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,7 +99,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mRegister = (Button) findViewById(R.id.register_button);
+        Button mRegister = findViewById(R.id.register_button);
         mRegister.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,25 +117,29 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             return;
         }
 
-        getLoaderManager().initLoader(0, null, this);
+        LoaderManager loaderManager = getLoaderManager();
+        loaderManager.initLoader(0, null, this);
     }
 
     private boolean mayRequestContacts() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
         }
+
         if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             return true;
         }
+
         if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        @TargetApi(Build.VERSION_CODES.M)
-                        public void onClick(View v) {
-                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-                        }
-                    });
+            Snackbar snackbar = Snackbar.make(mEmailView, R.string.permission_rationale,
+                    Snackbar.LENGTH_INDEFINITE);
+            snackbar.setAction(android.R.string.ok, new View.OnClickListener() {
+                @Override
+                @TargetApi(Build.VERSION_CODES.M)
+                public void onClick(View v) {
+                    requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
+                }
+            });
         } else {
             requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
         }
@@ -144,7 +153,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if ((grantResults.length == 1)
+                    && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 populateAutoComplete();
             }
         }
@@ -165,72 +175,63 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
-        // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        Editable emailText = mEmailView.getText();
+        Editable passwordText = mPasswordView.getText();
 
-        boolean cancel = false;
-        View focusView = null;
-
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
-        }
-
-        if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
-            focusView.requestFocus();
+        if ((passwordText == null) || (passwordText.length() == 0)
+                || isPasswordInvalid(passwordText.toString())) {
+            mPasswordView.setError("This password is too short");
+            mPasswordView.requestFocus();
+        } else if ((emailText == null) || (emailText.length() == 0)) {
+            mEmailView.setError("This field is required");
+            mEmailView.requestFocus();
+        } else if (isEmailInvalid(emailText.toString())) {
+            mEmailView.setError("This email address is invalid");
+            mEmailView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
             signIn();
         }
     }
 
     private void signIn() {
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        if ((mEmailView != null) && (mPasswordView != null)) {
+            Editable emailText = mEmailView.getText();
+            Editable passwordText = mPasswordView.getText();
 
-        showProgress(true);
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signIn:onComplete:" + task.isSuccessful());
+            // Store values at the time of the login attempt.
+            String email = emailText.toString();
+            String password = passwordText.toString();
 
-                        showProgress(false);
+            showProgress(true);
+            Task<AuthResult> authResultTask = mAuth.signInWithEmailAndPassword(email, password);
+            authResultTask.addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                    Log.d(TAG, "signIn:onComplete:" + task.isSuccessful());
 
-                        if (task.isSuccessful()) {
-                            startActivity(new Intent(LoginActivity.this, MainContentActivity.class));
-                            finish();
-                        } else {
-                            Toast.makeText(LoginActivity.this, "Sign In Failed",
-                                    Toast.LENGTH_LONG).show();
-                        }
+                    showProgress(false);
+
+                    if (task.isSuccessful()) {
+                        startActivity(new Intent(LoginActivity.this,
+                                MainContentActivity.class));
+                        finish();
+                    } else {
+                        Toast toast = Toast.makeText(
+                                LoginActivity.this, "Sign In Failed",
+                                Toast.LENGTH_LONG);
+                        toast.show();
                     }
-                });
+                }
+            });
+        }
     }
 
-    private boolean isEmailValid(String email) {
-        return email.contains("@");
+    private boolean isPasswordInvalid(CharSequence password) {
+        return password.length() <= 4;
     }
 
-    private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+    private boolean isEmailInvalid(String email) {
+        return !email.contains("@");
     }
 
     /**
@@ -241,11 +242,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        Resources resources = getResources();
+        int shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime);
 
         mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(
-                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+        ViewPropertyAnimator animate = mProgressView.animate();
+        ViewPropertyAnimator viewPropertyAnimator = animate.setDuration(shortAnimTime);
+        ViewPropertyAnimator alpha = viewPropertyAnimator.alpha(
+                show ? 1 : 0);
+        alpha.setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -304,7 +309,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         };
 
         int ADDRESS = 0;
-        int IS_PRIMARY = 1;
     }
 }
 

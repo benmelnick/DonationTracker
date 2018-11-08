@@ -5,7 +5,8 @@ import java.io.Serializable;
 /**
  * information holder for donation items
  */
-public class Item implements Serializable  {
+@SuppressWarnings("unused")
+class Item implements Serializable  {
     private String timeStamp;
     private String shortDescription;
     private String fullDescription;
@@ -14,64 +15,39 @@ public class Item implements Serializable  {
     private String location;
 
     public Item() {
-
+        // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Item(String t, String s, String f, double v, String c, String l) {
-        timeStamp = t;
-        shortDescription = s;
-        fullDescription = f;
-        value = v;
-        category = c;
-        location = l;
+    Item(String t, String s, String f, double v, String c, String l) {
+        this.timeStamp = t;
+        this.shortDescription = s;
+        this.fullDescription = f;
+        this.value = v;
+        this.category = c;
+        this.location = l;
     }
 
     public String getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(String t) {
-        timeStamp = t;
-    }
-
     public String getShortDescription() {
         return shortDescription;
-    }
-
-    public void setShortDescription(String s) {
-        shortDescription = s;
     }
 
     public String getFullDescription() {
         return fullDescription;
     }
 
-    public void setFullDescription(String f) {
-        fullDescription = f;
-    }
-
     public double getValue() {
         return value;
-    }
-
-    public void setValue(double v) {
-        value = v;
     }
 
     public String getCategory() {
         return category;
     }
 
-    public void setCategory(String c) {
-        category = c;
-    }
-
     public String getLocation() {
         return location;
-    }
-
-    @Override
-    public String toString() {
-        return shortDescription;
     }
 }

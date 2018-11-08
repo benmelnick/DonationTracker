@@ -1,6 +1,7 @@
 package com.example.benmelnick.donationtracker;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,7 +14,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.BufferedReader;
@@ -21,11 +21,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+/**
+ * The activity shown post login
+ */
+@SuppressWarnings("CyclicClassDependency")
 public class MainContentActivity extends AppCompatActivity {
     private static final String TAG = "MainContentActivity";
 
-    private FirebaseAuth mAuth;
-    private DatabaseReference mDatabase;
+    //private FirebaseAuth mAuth;
+    //private DatabaseReference mDatabase;
     private TextView mMessage;
 
     @Override
@@ -40,17 +44,20 @@ public class MainContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_content);
 
-        mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        //final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        mMessage = (TextView)findViewById(R.id.message);
+        mMessage = findViewById(R.id.message);
 
         String userId = mAuth.getUid();
         if (userId != null) {
-            mDatabase.child("users").child(userId).addValueEventListener(new ValueEventListener() {
+            DatabaseReference userRef = FirebaseHelper.INSTANCE
+                    .getDatabaseReference("users", userId);
+            userRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    String userName = dataSnapshot.child("name").getValue(String.class);
+                    DataSnapshot nameSnap = dataSnapshot.child("name");
+                    String userName = nameSnap.getValue(String.class);
                     String welcome = "Welcome, " + userName + "!";
                     mMessage.setText(welcome);
                 }
@@ -66,7 +73,7 @@ public class MainContentActivity extends AppCompatActivity {
             readFile();
         }
 
-        Button mLogout = (Button) findViewById(R.id.logout_button);
+        Button mLogout = findViewById(R.id.logout_button);
         mLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -77,7 +84,7 @@ public class MainContentActivity extends AppCompatActivity {
             }
         });
 
-        Button goToList = (Button) findViewById(R.id.viewLocationList);
+        Button goToList = findViewById(R.id.viewLocationList);
         goToList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +93,7 @@ public class MainContentActivity extends AppCompatActivity {
             }
         });
 
-        Button goToMap = (Button) findViewById(R.id.viewLocationMap);
+        Button goToMap = findViewById(R.id.viewLocationMap);
         goToMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,7 +102,7 @@ public class MainContentActivity extends AppCompatActivity {
             }
         });
 
-        Button search = (Button)findViewById(R.id.search);
+        Button search = findViewById(R.id.search);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,14 +120,16 @@ public class MainContentActivity extends AppCompatActivity {
         Model model = Model.INSTANCE;
         try {
             //Open a stream on the raw file
-            InputStream is = getResources().openRawResource(R.raw.locationdata);
+            Resources resources = getResources();
+            InputStream is = resources.openRawResource(R.raw.locationdata);
             //From here we probably should call a model method and pass the InputStream
             //Wrap it in a BufferedReader so that we get the readLine() method
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
             String line;
             br.readLine(); //get rid of header line
-            while ((line = br.readLine()) != null) {
+            line = br.readLine();
+            while (line != null) {
                 Log.d(TAG, line);
                 String[] tokens = line.split(",");
                 int id = Integer.parseInt(tokens[0]);
@@ -134,7 +143,9 @@ public class MainContentActivity extends AppCompatActivity {
                 String type = tokens[8];
                 String phone = tokens[9];
                 String web = tokens[10];
-                model.addLocation(new Location(id, name, lat, lon, address, city, state, zip, type, phone, web));
+                model.addLocation(new Location(id, name, lat, lon, address,
+                        city, state, zip, type, phone, web));
+                line = br.readLine();
             }
             br.close();
         } catch (IOException e) {
