@@ -40,9 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText mName;
     private Spinner mType;
 
-    //boolean to see if authentication has already been attempted
     private FirebaseAuth mAuth;
-    //private DatabaseReference mDatabase;
 
     @Override
     public void onBackPressed() {
@@ -57,8 +55,6 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         mAuth = FirebaseAuth.getInstance();
-        //FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        //mDatabase = firebaseDatabase.getReference();
 
         mEmail = findViewById(R.id.register_email);
         mPassword1 = findViewById(R.id.register_password1);
@@ -107,7 +103,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         if ((emailText != null) && (passwordText != null)
                 && (passwordConfText != null) && (nameText != null) && (mTypeSelected != null)) {
-            //check for a name
             if (nameText.length() == 0) {
                 mName.setError("This field is required.");
                 mName.requestFocus();
@@ -178,8 +173,6 @@ public class RegisterActivity extends AppCompatActivity {
             String type = mTypeSelected.toString();
             User newUser = new User(id, email, name, type);
 
-            //mDatabase.child("users").child(id).setValue(newUser);
-            //FirebaseHelper.INSTANCE.getDatabaseReference("users", id).setValue(newUser);
             FirebaseHelper.INSTANCE.setDatabaseValue(newUser, "users", id);
 
             // Go to MainActivity

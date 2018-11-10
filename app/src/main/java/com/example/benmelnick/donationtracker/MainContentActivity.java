@@ -28,8 +28,6 @@ import java.io.InputStreamReader;
 public class MainContentActivity extends AppCompatActivity {
     private static final String TAG = "MainContentActivity";
 
-    //private FirebaseAuth mAuth;
-    //private DatabaseReference mDatabase;
     private TextView mMessage;
 
     @Override
@@ -45,7 +43,6 @@ public class MainContentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_content);
 
         final FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        //final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
         mMessage = findViewById(R.id.message);
 

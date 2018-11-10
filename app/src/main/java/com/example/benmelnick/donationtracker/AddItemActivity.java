@@ -28,15 +28,10 @@ public class AddItemActivity extends AppCompatActivity {
     private Spinner mCategory;
     private Location mLocation;
 
-    //private DatabaseReference mDatabase;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_item);
-
-        //FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        //mDatabase = firebaseDatabase.getReference();
 
         mShort = findViewById(R.id.short_description);
         mFull = findViewById(R.id.full_description);
@@ -129,13 +124,6 @@ public class AddItemActivity extends AppCompatActivity {
             Item item = new Item(currentDate, shortDescription,
                     fullDescription, value, category, location);
 
-            //updates info for location
-            //adds new item to location's sub-database of items
-            //mDatabase.child("locations").child(location).child("inventory")
-            //        .child(shortDescription).setValue(item);
-            //DatabaseReference newItemRef = FirebaseHelper.INSTANCE.getDatabaseReference(
-            //        "locations", location, "inventory", shortDescription);
-            //newItemRef.setValue(item);
             FirebaseHelper.INSTANCE.setDatabaseValue(item, "locations",
                     location, "inventory", shortDescription);
         }

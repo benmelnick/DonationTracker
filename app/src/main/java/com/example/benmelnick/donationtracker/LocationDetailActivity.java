@@ -22,8 +22,6 @@ public class LocationDetailActivity extends AppCompatActivity {
             Bundle arguments = new Bundle();
             Intent intent = getIntent();
 
-            //arguments.putAll(intent.getExtras());
-
             arguments.putInt(LocationDetailFragment.ARG_ITEM_ID,
                     intent.getIntExtra(LocationDetailFragment.ARG_ITEM_ID, 1000));
             // pass the entire location object rather than its ID number

@@ -42,9 +42,6 @@ public class InventoryListActivity extends AppCompatActivity {
         int locationId = intent.getIntExtra("id", 0);
         Location mLocation = Model.INSTANCE.findLocationById(locationId);
 
-        // FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        // DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-
         String locName = null;
         if (mLocation != null) {
             //noinspection LawOfDemeter
