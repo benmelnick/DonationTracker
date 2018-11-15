@@ -42,6 +42,8 @@ import com.google.firebase.auth.AuthResult;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.support.test.espresso.idling.CountingIdlingResource;
+
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
@@ -67,9 +69,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private FirebaseAuth mAuth;
 
+    private CountingIdlingResource espressoIdler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        espressoIdler = new CountingIdlingResource("Firebase_Usage");
+
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
@@ -194,6 +201,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void signIn() {
+        espressoIdler.increment();
+
         if ((mEmailView != null) && (mPasswordView != null)) {
             Editable emailText = mEmailView.getText();
             Editable passwordText = mPasswordView.getText();
@@ -221,17 +230,24 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 Toast.LENGTH_LONG);
                         toast.show();
                     }
+
+                    espressoIdler.decrement();
                 }
             });
         }
     }
 
-    private boolean isPasswordInvalid(CharSequence password) {
+    static boolean isPasswordInvalid(CharSequence password) {
         return password.length() <= 4;
     }
 
-    private boolean isEmailInvalid(String email) {
-        return !email.contains("@");
+    static boolean isEmailInvalid(CharSequence email) {
+        if ((email == null) || (email.length() <= 5)) {
+            return true;
+        } else {
+            String emailString = email.toString();
+            return !emailString.contains("@");
+        }
     }
 
     /**
@@ -309,6 +325,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         };
 
         int ADDRESS = 0;
+    }
+
+    /**
+     * Returns the idler used for Firebase testing
+     * @return CountingIdlingResource
+     */
+    public CountingIdlingResource getEspressoIdler() {
+        return espressoIdler;
     }
 }
 

@@ -32,7 +32,6 @@ public class SearchResultsActivity extends AppCompatActivity {
     //one of these guaranteed to exist
     private String item; //item we are searching
     private String category; //category we are searching
-    private final ArrayList<Item> mItems = new ArrayList<>(); //list of items that match the search
 
     private ItemAdapter adapter;
     private TextView description;
@@ -56,7 +55,7 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         RecyclerView mRecyclerView = findViewById(R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ItemAdapter(mItems);
+        adapter = new ItemAdapter();
         mRecyclerView.setAdapter(adapter);
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
@@ -114,12 +113,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                                     checkCurrentInventoryItem(ds, "shortDescription", item);
                                 }
 
-                                if (mItems.isEmpty()) {
-                                    Toast toast = Toast.makeText(SearchResultsActivity.this,
-                                            "No items matching the search fields were found.",
-                                            Toast.LENGTH_LONG);
-                                    toast.show();
-                                }
+                                checkEmptyList();
                             }
 
                             @Override
@@ -147,12 +141,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                         checkCurrentInventoryItem(ds, "shortDescription", item);
                     }
 
-                    if (mItems.isEmpty()) {
-                        Toast toast = Toast.makeText(SearchResultsActivity.this,
-                                "No items matching the search fields were found.",
-                                Toast.LENGTH_LONG);
-                        toast.show();
-                    }
+                    checkEmptyList();
                 }
 
                 @Override
@@ -188,12 +177,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                                     checkCurrentInventoryItem(ds, "category", category);
                                 }
 
-                                if (mItems.isEmpty()) {
-                                    Toast toast = Toast.makeText(SearchResultsActivity.this,
-                                            "No items matching the search fields were found.",
-                                            Toast.LENGTH_LONG);
-                                    toast.show();
-                                }
+                                checkEmptyList();
                             }
 
                             @Override
@@ -221,12 +205,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                         checkCurrentInventoryItem(ds, "category", category);
                     }
 
-                    if (mItems.isEmpty()) {
-                        Toast toast = Toast.makeText(SearchResultsActivity.this,
-                                "No items matching the search fields were found.",
-                                Toast.LENGTH_LONG);
-                        toast.show();
-                    }
+                    checkEmptyList();
                 }
 
                 @Override
@@ -282,17 +261,9 @@ public class SearchResultsActivity extends AppCompatActivity {
                                         if (value != null) {
                                             Item item = new Item(timeStamp, shortDescription,
                                                     fullDescription, value, category, location);
-                                            mItems.add(item);
-                                            adapter.notifyDataSetChanged();
+                                            adapter.addItem(item);
                                         }
                                     }
-                                }
-
-                                if (mItems.isEmpty()) {
-                                    Toast toast = Toast.makeText(SearchResultsActivity.this,
-                                            "No items matching the search fields were found.",
-                                            Toast.LENGTH_LONG);
-                                    toast.show();
                                 }
                             }
 
@@ -342,16 +313,9 @@ public class SearchResultsActivity extends AppCompatActivity {
                             if (value != null) {
                                 Item item = new Item(timeStamp, shortDescription,
                                         fullDescription, value, category, location);
-                                mItems.add(item);
-                                adapter.notifyDataSetChanged();
+                                adapter.addItem(item);
                             }
                         }
-                    }
-                    if (mItems.isEmpty()) {
-                        Toast toast = Toast.makeText(SearchResultsActivity.this,
-                                "No items matching the search fields were found.",
-                                Toast.LENGTH_LONG);
-                        toast.show();
                     }
                 }
 
@@ -397,10 +361,19 @@ public class SearchResultsActivity extends AppCompatActivity {
                 if (itemVal != null) {
                     Item item = new Item(timeStamp, shortDescription, fullDescription,
                             itemVal, category, location);
-                    mItems.add(item);
-                    adapter.notifyDataSetChanged();
+                    adapter.addItem(item);
                 }
             }
+        }
+    }
+
+
+    private void checkEmptyList() {
+        if (adapter.mItems.isEmpty()) {
+            Toast toast = Toast.makeText(SearchResultsActivity.this,
+                    "No items matching the search fields were found.",
+                    Toast.LENGTH_LONG);
+            toast.show();
         }
     }
 
@@ -408,8 +381,17 @@ public class SearchResultsActivity extends AppCompatActivity {
     public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> {
         private final List<Item> mItems;
         // Provide a suitable constructor (depends on the kind of dataset)
-        ItemAdapter(List<Item> values) {
-            mItems = values;
+        ItemAdapter() {
+            mItems = new ArrayList<>();
+        }
+
+        /**
+         * Adds a new item to the adapter
+         * @param newItem The item to add
+         */
+        void addItem(Item newItem) {
+            mItems.add(newItem);
+            this.notifyDataSetChanged();
         }
 
         // Create new views (invoked by the layout manager)

@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -39,8 +41,9 @@ public class LocationListActivity extends AppCompatActivity {
     public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.MyViewHolder> {
         private final List<Location> mLocations;
         // Provide a suitable constructor (depends on the kind of dataset)
-        LocationAdapter(List<Location> values) {
-            mLocations = values;
+        LocationAdapter(Collection<Location> values) {
+            mLocations = new ArrayList<>();
+            mLocations.addAll(values);
         }
 
         // Create new views (invoked by the layout manager)

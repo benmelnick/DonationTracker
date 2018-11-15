@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -27,24 +28,26 @@ import java.util.ArrayList;
  */
 public class InventoryListActivity extends AppCompatActivity {
 
-    private final ArrayList<Item> mItems = new ArrayList<>();
-
     private ItemAdapter adapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory_list);
 
+        final RecyclerView mRecyclerView = findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        adapter = new ItemAdapter();
+        mRecyclerView.setAdapter(adapter);
+
         //define the location being referenced
         Intent intent = getIntent();
         int locationId = intent.getIntExtra("id", 0);
         Location mLocation = Model.INSTANCE.findLocationById(locationId);
 
-        String locName = null;
+        String locName = "";
         if (mLocation != null) {
-            //noinspection LawOfDemeter
             locName = mLocation.getName();
         }
 
@@ -54,6 +57,8 @@ public class InventoryListActivity extends AppCompatActivity {
         invRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //ArrayList<Item> itemList = new ArrayList<>();
+
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     DataSnapshot timeSnap = ds.child("timeStamp");
                     String timeStamp = timeSnap.getValue(String.class);
@@ -76,18 +81,24 @@ public class InventoryListActivity extends AppCompatActivity {
                     if (value != null) {
                         Item item = new Item(timeStamp, shortDescription,
                                 fullDescription, value, category, location);
-
-                        mItems.add(item);
-                        adapter.notifyDataSetChanged();
+                        //itemList.add(item);
+                        adapter.addItem(item);
                     }
                 }
 
-                if (mItems.isEmpty()) {
+                /*
+                if (itemList.isEmpty()) {
                     Toast toast = Toast.makeText(InventoryListActivity.this,
                             "This location does not have any items in its inventory!",
                             Toast.LENGTH_LONG);
                     toast.show();
+                } else {
+                    //adapter = new ItemAdapter(itemList);
+                    //mRecyclerView.setAdapter(adapter);
                 }
+                */
+
+                checkEmptyList();
             }
 
             @Override
@@ -96,22 +107,35 @@ public class InventoryListActivity extends AppCompatActivity {
             }
         });
 
-        RecyclerView mRecyclerView = findViewById(R.id.list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ItemAdapter(mItems);
-        mRecyclerView.setAdapter(adapter);
-
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle("Inventory");
         }
     }
 
+    private void checkEmptyList() {
+        if (adapter.mItems.isEmpty()) {
+            Toast toast = Toast.makeText(InventoryListActivity.this,
+                    "This location does not have any items in its inventory!",
+                    Toast.LENGTH_LONG);
+            toast.show();
+        }
+    }
+
     public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> {
         private final List<Item> mItems;
-        // Provide a suitable constructor (depends on the kind of dataset)
-        ItemAdapter(List<Item> values) {
-            mItems = values;
+
+        ItemAdapter() {
+            mItems = new ArrayList<>();
+        }
+
+        /**
+         * Adds a new item to the adapter
+         * @param newItem The item to add
+         */
+        void addItem(Item newItem) {
+            mItems.add(newItem);
+            this.notifyDataSetChanged();
         }
 
         // Create new views (invoked by the layout manager)

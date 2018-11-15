@@ -95,38 +95,37 @@ public class RegisterActivity extends AppCompatActivity {
         mPassword2.setError(null);
         mName.setError(null);
 
+        // Get Text for different registration fields
         Editable emailText = mEmail.getText();
         Editable passwordText = mPassword1.getText();
         Editable passwordConfText = mPassword2.getText();
         Editable nameText = mName.getText();
         Object mTypeSelected = mType.getSelectedItem();
 
-        if ((emailText != null) && (passwordText != null)
-                && (passwordConfText != null) && (nameText != null) && (mTypeSelected != null)) {
-            if (nameText.length() == 0) {
-                mName.setError("This field is required.");
-                mName.requestFocus();
-            } else if ("Choose an account type".equals(mTypeSelected.toString())) {
-                ((TextView) mType.getSelectedView()).setError("Must select an account type");
-                mType.requestFocus();
-            } else if (passwordText.length() == 0) {
-                mPassword1.setError("This field is required");
-                mPassword1.requestFocus();
-            } else if (passwordConfText.length() == 0) {
-                mPassword2.setError("This field is required");
-                mPassword2.requestFocus();
-            } else if (isPasswordInvalid(passwordText)) {
-                mPassword1.setError("This password is too short");
-                mPassword1.requestFocus();
-            } else if (!passwordText.equals(passwordConfText)) {
-                mPassword2.setError("Passwords must match.");
-                mPassword2.requestFocus();
-            } else if (isEmailInvalid(emailText)) {
-                mEmail.setError("This email address is invalid");
-                mEmail.requestFocus();
-            } else {
-                signUp();
-            }
+        // Check to make sure all fields have text
+        if ((emailText == null) || (passwordText == null) || (passwordConfText == null)
+                || (nameText == null)) {
+            return;
+        }
+
+        // Check to make sure all fields pass tests
+        if (nameText.length() == 0) {
+            mName.setError("This field is required.");
+            mName.requestFocus();
+        } else if (isEmailInvalid(emailText)) {
+            mEmail.setError("This email address is invalid.");
+            mEmail.requestFocus();
+        } else if (isPasswordInvalid(passwordText)) {
+            mPassword1.setError("This password is too short.");
+            mPassword1.requestFocus();
+        } else if (!passwordText.equals(passwordConfText)) {
+            mPassword2.setError("Passwords must match.");
+            mPassword2.requestFocus();
+        } else if ("Choose an account type".equals(mTypeSelected.toString())) {
+            ((TextView) mType.getSelectedView()).setError("Must select an account type.");
+            mType.requestFocus();
+        } else {
+            signUp();
         }
     }
 
@@ -181,11 +180,13 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isPasswordInvalid(CharSequence password) {
+    @SuppressWarnings("WeakerAccess")
+    static boolean isPasswordInvalid(CharSequence password) {
         return (password == null) || (password.length() <= 4);
     }
 
-    private boolean isEmailInvalid(CharSequence email) {
+    @SuppressWarnings("WeakerAccess")
+    static boolean isEmailInvalid(CharSequence email) {
         if ((email == null) || (email.length() <= 5)) {
             return true;
         } else {

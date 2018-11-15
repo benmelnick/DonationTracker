@@ -54,6 +54,7 @@ public class LocationDetailFragment extends Fragment {
         }
     }
 
+    @SuppressWarnings("FeatureEnvy")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

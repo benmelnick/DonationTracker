@@ -38,6 +38,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         locations = Model.INSTANCE.getLocations();
     }
 
+    @SuppressWarnings("FeatureEnvy")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         if (!locations.isEmpty()) {

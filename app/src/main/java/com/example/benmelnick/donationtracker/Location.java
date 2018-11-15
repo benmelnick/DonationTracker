@@ -21,30 +21,32 @@ public class Location implements Serializable {
 
     /**
      * @param id The location id
-     * @param n name
-     * @param la latitude
-     * @param lo longitude
-     * @param a address
-     * @param c City
-     * @param s State
-     * @param z Zip Code
-     * @param t Type
-     * @param p Phone Number
-     * @param w Website
+     * @param name name
+     * @param latitude latitude
+     * @param longitude longitude
+     * @param address address
+     * @param city City
+     * @param state State
+     * @param zip Zip Code
+     * @param type Type
+     * @param phone Phone Number
+     * @param website Website
      */
-    public Location(int id, String n, double la, double lo, String a,
-                    String c, String s, String z, String t, String p, String w) {
+    @SuppressWarnings("ConstructorWithTooManyParameters")
+    public Location(int id, String name, double latitude, double longitude,
+                    String address, String city, String state, String zip,
+                    String type, String phone, String website) {
         this.id = id;
-        this.name = n;
-        this.type = t;
-        this.latitude = la;
-        this.longitude = lo;
-        this.address = a;
-        this.city = c;
-        this.state = s;
-        this.zip = z;
-        this.phoneNumber = p;
-        this.web = w;
+        this.name = name;
+        this.type = type;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
+        this.phoneNumber = phone;
+        this.web = website;
     }
 
     /**
@@ -129,5 +131,10 @@ public class Location implements Serializable {
      */
     public String getWeb() {
         return web;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

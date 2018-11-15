@@ -18,6 +18,15 @@ class Item implements Serializable  {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
+    /**
+     * @param t The timestamp for when the item was added
+     * @param s The item's short description or name
+     * @param f The item's full description
+     * @param v The item's value
+     * @param c The item's category
+     * @param l The item's location
+     */
+    @SuppressWarnings("ConstructorWithTooManyParameters")
     Item(String t, String s, String f, double v, String c, String l) {
         this.timeStamp = t;
         this.shortDescription = s;

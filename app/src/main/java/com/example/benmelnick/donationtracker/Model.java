@@ -3,6 +3,7 @@ package com.example.benmelnick.donationtracker;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public final class Model {
      * @return The list of locations
      */
     public final List<Location> getLocations() {
-        return locations;
+        return Collections.unmodifiableList(locations);
     }
 
     /**
@@ -42,6 +43,7 @@ public final class Model {
                 return d;
             }
         }
+
         Log.d("MYAPP", "Warning - Failed to find id: " + id);
         return null;
     }
